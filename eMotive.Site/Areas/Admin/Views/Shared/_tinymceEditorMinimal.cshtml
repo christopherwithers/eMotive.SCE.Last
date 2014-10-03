@@ -1,0 +1,25 @@
+﻿    <script src="@Url.Content("~/Content/tinymce/tinymce.min.js")"></script> 
+    <script type="text/javascript">
+        
+        tinymce.init({
+            selector: "textarea",
+            plugins: [
+                "advlist autolink lists link image charmap print preview anchor",
+                "searchreplace visualblocks code fullscreen",
+                "insertdatetime media table contextmenu paste"
+            ],
+            toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+            menubar: false,
+            mode: "specific_textareas",
+            editor_selector: "tinymce",
+            forced_root_block: false,
+            encoding: "xml",
+            setup: function (editor) {
+                editor.on('SaveContent', function(e) {
+                    e.content = e.content.replace(/&#39/g, '&apos');
+                });
+            }
+
+
+        });
+    </script>
