@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Contexts;
 using eMotive.Managers.Interfaces;
 using eMotive.Managers.Objects.Search;
 using eMotive.MMI.SignalR;
@@ -9,21 +7,14 @@ using eMotive.Models.Objects.SignupsMod;
 using eMotive.Search.Interfaces;
 using eMotive.Services.Interfaces;
 using Microsoft.AspNet.SignalR;
-using Microsoft.AspNet.SignalR.Hubs;
-using ServiceStack.Common.Extensions;
-using ServiceStack.Common.Utils;
+using ServiceStack.Common;
 using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface;
 
 
 namespace eMotive.Api
 {
-    public class ServiceResult<T>
-    {
-        public bool Success { get; set; }
-        public IEnumerable<string> Errors { get; set; }
-        public T Result { get; set; }
-    }
+
 
   /*  [Route("/Courses/New", "GET")]
     public class NewCourse

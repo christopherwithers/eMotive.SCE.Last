@@ -1,7 +1,6 @@
-﻿using System;
-using System.Reflection;
-using AutoMapper;
+﻿using AutoMapper;
 using System.Linq;
+using eMotive.Repository.Objects.Forms;
 using Extensions;
 using eMotive.Models.Objects.Search;
 using eMotive.Repository.Objects.News;
@@ -12,6 +11,7 @@ using Profile = eMotive.Repository.Objects.Users.Profile;
 using mUsers = eMotive.Models.Objects.Users;
 using mRoles = eMotive.Models.Objects.Roles;
 using mNews = eMotive.Models.Objects.News;
+using mForm = eMotive.Models.Objects.Forms;
 using mPages = eMotive.Models.Objects.Pages;
 using mSignups = eMotive.Models.Objects.Signups;
 using mod = eMotive.Models.Objects.SignupsMod;
@@ -31,6 +31,7 @@ namespace eMotive.Managers
             ConfigureNewsMapping();
             ConfigurePageMapping();
             ConfigureSignupMapping();
+            ConfigureFormMapping();
         }
 
         private static void ConfigureSignupMapping()
@@ -79,6 +80,15 @@ namespace eMotive.Managers
         private static void ConfigureSearchMapping()
         {
             Mapper.CreateMap<BasicSearch, emSearch>().ForMember(m => m.CurrentPage, o => o.MapFrom(m => m.Page));
+        }
+
+        private static void ConfigureFormMapping()
+        {
+            Mapper.CreateMap<FormList, mForm.FormList>();
+            Mapper.CreateMap<mForm.FormList, FormList>();
+
+            Mapper.CreateMap<FormListItem, mForm.FormListItem>();
+            Mapper.CreateMap<mForm.FormListItem, FormListItem>();
         }
 
         private static void ConfigureNewsMapping()

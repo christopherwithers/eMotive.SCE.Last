@@ -249,6 +249,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Areas\Admin\AdminAreaRegistration.cs" />
     <Compile Include="Areas\Admin\Controllers\EmailController.cs" />
+    <Compile Include="Areas\Admin\Controllers\FormsController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\NavigationController.cs" />
     <Compile Include="Areas\Admin\Controllers\NewsController.cs" />
@@ -290,11 +291,12 @@
   <ItemGroup>
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Content Include="AngularJs\Apps\DropDownListManagement\SignupManagementApp.js" />
-    <Content Include="AngularJs\Apps\DropDownListManagement\Templates\Create.html" />
-    <Content Include="AngularJs\Apps\DropDownListManagement\Templates\Edit.html" />
-    <Content Include="AngularJs\Apps\DropDownListManagement\Templates\Home.html" />
+    <Content Include="AngularJs\Apps\FormManagement\formManagementApp.js" />
+    <Content Include="AngularJs\Apps\FormManagement\Templates\Create.html" />
+    <Content Include="AngularJs\Apps\FormManagement\Templates\Edit.html" />
+    <Content Include="AngularJs\Apps\FormManagement\Templates\Home.html" />
     <Content Include="AngularJs\Apps\SignupManagement\SignupManagementApp.js" />
+    <Content Include="AngularJs\Services\FormServices.js" />
     <Content Include="AngularJs\Services\SignupServices.js" />
     <Content Include="App_Data\emotive.sql" />
     <Content Include="App_Readme\Elmah.MySql.sql" />
@@ -840,6 +842,7 @@
     <Content Include="Areas\Admin\Views\Signups\EditSignup.cshtml" />
     <Content Include="Areas\Admin\Views\Signups\SignupSearch.cshtml" />
     <Content Include="Areas\Admin\Views\Settings\Site.cshtml" />
+    <Content Include="Areas\Admin\Views\Forms\Index.cshtml" />
     <None Include="Properties\PublishProfiles\MMI DEMO.pubxml" />
     <Content Include="Scripts\errors.json" />
     <Content Include="Scripts\angular-touch.min.js.map" />

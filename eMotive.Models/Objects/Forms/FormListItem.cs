@@ -1,4 +1,4 @@
-﻿namespace eMotive.Repository.Objects.Forms
+﻿namespace eMotive.Models.Objects.Forms
 {
     public class FormListItem
     {

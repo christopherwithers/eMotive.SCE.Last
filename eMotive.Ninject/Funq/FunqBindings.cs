@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using AutoMapper;
 using Cache.Interfaces;
 using Cache.Objects;
 using eMotive.Managers.Interfaces;
@@ -21,7 +22,7 @@ namespace eMotive.IoCBindings.Funq
             var connectionString = ConfigurationManager.ConnectionStrings["live"].ConnectionString ?? string.Empty;
             var enableLogging = ConfigurationManager.AppSettings["Logging"] ?? "False";
             var luceneIndex = ConfigurationManager.AppSettings["LuceneIndex"] ?? string.Empty;
-
+            container.Register(c => Mapper.Engine);
 
             container.Register<ICache>(c => new DevNullCache());
 
@@ -30,7 +31,7 @@ namespace eMotive.IoCBindings.Funq
             container.Register<INewsRepository>(c => new MySqlNewsRepository(connectionString)).ReusedWithin(ReuseScope.Request);
             container.Register<IPageRepository>(c => new MySqlPageRepository(connectionString)).ReusedWithin(ReuseScope.Request);
             container.Register<ISessionRepository>(c => new MySqlSessionRepository(connectionString)).ReusedWithin(ReuseScope.Request);
-
+            container.Register<IFormRepository>(c => new MySqlFormRepository(connectionString)).ReusedWithin(ReuseScope.Request);
 
             container.Register<IUserManager>(c => new UserManager(c.Resolve<IUserRepository>(), c.Resolve<IAccountManager>(), c.Resolve<ISearchManager>(), c.Resolve<IGroupManager>())
             {
@@ -38,6 +39,12 @@ namespace eMotive.IoCBindings.Funq
                 roleManager = c.Resolve<IRoleManager>()
             }).ReusedWithin(ReuseScope.Request);
 
+
+            container.Register<IFormManager>(c => new FormManager(c.Resolve<IFormRepository>())
+            {
+                NotificationService = c.Resolve<INotificationService>(),
+                Mapper = c.Resolve<IMappingEngine>()
+            }).ReusedWithin(ReuseScope.Request);
 
             container.Register<IRoleManager>(c => new RoleManager(c.Resolve<IRoleRepository>(), c.Resolve<ISearchManager>())
             {
