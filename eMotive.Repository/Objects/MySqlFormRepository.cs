@@ -61,7 +61,7 @@ namespace eMotive.Repository.Objects
                         }).ToList();
 
 
-                        sql = "INSERT INTO `FormListItems` (`FormListID`, `Value`, `Text`) Values (@ApplicationID, @Name);";
+                        sql = "INSERT INTO `FormListItems` (`FormListID`, `Value`, `Text`) Values (@FormListID, @Value, @Text);";
 
                         success &= cn.Execute(sql, formListItems) > 0;
                     }
@@ -83,13 +83,13 @@ namespace eMotive.Repository.Objects
                     cn.Open();
                     var success = true;
                     #region fetch old FormList
-                    var sql = "SELECT `ID`,`Name` FROM `FormLists` a INNER JOIN `FormListItems` b ON a.`ID`=b.`FormListID` WHERE a.`ID`=@Id;";
+                    var sql = "SELECT a.`ID`,a.`Name` FROM `FormLists` a INNER JOIN `FormListItems` b ON a.`ID`=b.`FormListID` WHERE a.`ID`=@Id;";
 
                     var oldFormList = cn.Query<FormList, IEnumerable<FormListItem>, FormList>(sql, (oFormList, formListItems) =>
                     {
                         oFormList.Collection = formListItems;
                         return oFormList;
-                    }, new {id = formList.ID}).SingleOrDefault();
+                    }, new { id = formList.ID }, splitOn: "ID,FormListID,ID").SingleOrDefault();
                     #endregion
 
                     sql = "UPDATE `FormLists` SET `Name`=@Name WHERE `ID`=@Id;";
@@ -182,14 +182,16 @@ namespace eMotive.Repository.Objects
             using (var cn = Connection)
             {
                 cn.Open();
-                
-                const string sql = "SELECT `ID`,`Name` FROM `FormLists` a INNER JOIN `FormListItems` b ON a.`ID`=b.`FormListID` WHERE a.`ID`=@id;";
 
-                var collection = cn.Query<FormList, IEnumerable<FormListItem>, FormList>(sql, (formList, formListItems) =>
+                var sql = "SELECT `ID`,`Name` FROM `FormLists` WHERE `ID` = @id;";
+
+                var collection = cn.Query<FormList>(sql, new { id = id }).SingleOrDefault();
+
+                if (collection != null)
                 {
-                    formList.Collection = formListItems;
-                    return formList;
-                }, new {id = id}).SingleOrDefault();
+                    sql = "SELECT `ID`, `FormListID`, `Value`, `Text` FROM `FormListItems` WHERE `FormListID` = @id;";
+                    collection.Collection = cn.Query<FormListItem>(sql, new { id = collection.ID });
+                }
 
                 return collection;
             }
@@ -201,13 +203,15 @@ namespace eMotive.Repository.Objects
             {
                 cn.Open();
 
-                const string sql = "SELECT `ID`,`Name` FROM `FormLists` a INNER JOIN `FormListItems` b ON a.`ID`=b.`FormListID` WHERE a.`Name`=@name;";
+                var sql = "SELECT `ID`,`Name` FROM `FormLists` WHERE `Name` = @name;";
 
-                var collection = cn.Query<FormList, IEnumerable<FormListItem>, FormList>(sql, (formList, formListItems) =>
+                var collection = cn.Query<FormList>(sql, new { Name = name }).SingleOrDefault();
+
+                if (collection != null)
                 {
-                    formList.Collection = formListItems;
-                    return formList;
-                }, new {name = name}).SingleOrDefault();
+                    sql = "SELECT `ID`, `FormListID`, `Value`, `Text` FROM `FormListItems` WHERE `FormListID` = @id;";
+                    collection.Collection = cn.Query<FormListItem>(sql, new { id = collection.ID });
+                }
 
                 return collection;
             }
@@ -219,13 +223,25 @@ namespace eMotive.Repository.Objects
             {
                 cn.Open();
 
-                const string sql = "SELECT `ID`,`Name` FROM `FormLists` a INNER JOIN `FormListItems` b ON a.`ID`=b.`FormListID`;";
+                var sql = "SELECT `ID`,`Name` FROM `FormLists`;";
 
-                var collection = cn.Query<FormList, IEnumerable<FormListItem>, FormList>(sql, (formList, formListItems) =>
+                var collection = cn.Query<FormList>(sql);
+
+                if (collection.HasContent())
                 {
-                    formList.Collection = formListItems;
-                    return formList;
-                });
+                    sql = "SELECT `ID`, `FormListID`, `Value`, `Text` FROM `FormListItems`;";
+                    var items = cn.Query<FormListItem>(sql);
+
+                    if (items.HasContent())
+                    {
+                        var itemDict = items.GroupBy(m => m.FormListID).ToDictionary(k => k.Key, v => v.ToList());
+
+                        foreach (var item in collection)
+                        {
+                            item.Collection = itemDict[item.ID];
+                        }
+                    }
+                }
 
                 return collection;
             }
@@ -237,13 +253,25 @@ namespace eMotive.Repository.Objects
             {
                 cn.Open();
 
-                const string sql = "SELECT `ID`,`Name` FROM `FormLists` a INNER JOIN `FormListItems` b ON a.`ID`=b.`FormListID` WHERE a.`ID` in @ids;";
+                var sql = "SELECT `ID`,`Name` FROM `FormLists`  WHERE `ID` in @ids;";
 
-                var collection = cn.Query<FormList, IEnumerable<FormListItem>, FormList>(sql, (formList, formListItems) =>
+                var collection = cn.Query<FormList>(sql, new { ids = ids });
+
+                if (collection.HasContent())
                 {
-                    formList.Collection = formListItems;
-                    return formList;
-                }, new {ids = ids});
+                    sql = "SELECT `ID`, `FormListID`, `Value`, `Text` FROM `FormListItems` WHERE `FormListID` in @ids;";
+                    var items = cn.Query<FormListItem>(sql, new { ids = collection.Select(n => n.ID) });
+
+                    if (items.HasContent())
+                    {
+                        var itemDict = items.GroupBy(m => m.FormListID).ToDictionary(k => k.Key, v => v.ToList());
+
+                        foreach (var item in collection)
+                        {
+                            item.Collection = itemDict[item.ID];
+                        }
+                    }
+                }
 
                 return collection;
             }

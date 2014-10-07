@@ -298,6 +298,7 @@
     <Content Include="AngularJs\Apps\SignupManagement\SignupManagementApp.js" />
     <Content Include="AngularJs\Services\FormServices.js" />
     <Content Include="AngularJs\Services\SignupServices.js" />
+    <Content Include="AngularJs\Shared\angularErrorHandling.js" />
     <Content Include="App_Data\emotive.sql" />
     <Content Include="App_Readme\Elmah.MySql.sql" />
     <Content Include="App_Readme\Elmah.MySql.txt" />

@@ -1,9 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using eMotive.Managers.Interfaces;
 using eMotive.Models.Objects.Forms;
 using eMotive.Repository.Interfaces;
 using eMotive.Services.Interfaces;
+using Extensions;
 using rForm = eMotive.Repository.Objects.Forms;
 
 namespace eMotive.Managers.Objects
@@ -28,7 +31,62 @@ namespace eMotive.Managers.Objects
 
         public bool CreateFormList(FormList formList, out int id)
         {
-            throw new System.NotImplementedException();
+            id = -1;
+
+            if (string.IsNullOrEmpty(formList.Name))
+            {
+                if (!formList.Collection.HasContent())
+                {
+                    NotificationService.AddIssue("The form list has no name.");
+                    return false;
+                }
+            }
+
+            var formCheck = _formRepository.FetchFormList(formList.Name);
+
+            if (formCheck != null)
+            {
+                if (String.Equals(formList.Name, formCheck.Name, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    NotificationService.AddIssue(string.Format("A drop down list named '{0}' already exists.", formList.Name));
+                    return false;
+                }
+            }
+
+            if (!formList.Collection.HasContent())
+            {
+                NotificationService.AddIssue("The form list has no items.");
+                return false;
+            }
+
+            var duplicatesText = formList.Collection.GroupBy(n => n.Text).SelectMany(g => g.Skip(1));
+
+            if (duplicatesText.HasContent())
+            {
+                NotificationService.AddIssue(
+                    string.Format("Drop down list item text must be unique. Duplications detected: '{0}'",
+                        string.Join(",", duplicatesText.Select(n => n.Text))));
+                return false;
+            }
+
+            var duplicateValues = formList.Collection.GroupBy(n => n.Text).SelectMany(g => g.Skip(1));
+
+            if (duplicateValues.HasContent())
+            {
+                NotificationService.AddIssue(
+                    string.Format("Drop down list item values must be unique. Duplications detected: '{0}'",
+                        string.Join(",", duplicateValues.Select(n => n.Value))));
+                return false;
+            }
+
+            formList.Collection = formList.Collection.GroupBy(x => x.Text).Select(y => y.First()); //todo: need to remove empty 
+
+            if (_formRepository.CreateFormList(Mapper.Map<FormList, rForm.FormList>(formList), out id))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public bool UpdateFormList(FormList formList)

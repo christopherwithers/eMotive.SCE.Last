@@ -2,6 +2,17 @@
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
 }
+@section Crumbs
+{
+    <ul class="breadcrumb">
+        <li>
+            <a href="@Url.Action("index", "Home" , new { area="Admin" })">Home</a> <span class="divider">/</span>
+        </li>
+        <li class="active">
+            Form Admin
+        </li>
+    </ul>
+}
 
 <div ng-app="formManagementApp">
     <div ng-view></div>
@@ -9,11 +20,14 @@
 
 @section Scripts
 {
-    <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.16/angular.min.js"></script>
+<script src="//oss.maxcdn.com/angular.strap/2.0.0/angular-strap.min.js"></script>
+<script src="//oss.maxcdn.com/angular.strap/2.0.0/angular-strap.tpl.min.js"></script>
+
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular-sanitize.min.js"></script>
-<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular-route.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/angular-strap/2.0.0-rc.4/angular-strap.js"></script>
-<script src="~/Scripts/angular-strap.tpl.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular-animate.min.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular-route.min.js"></script><script src="~/AngularJs/Apps/FormManagement/formManagementApp.js"></script>
+<script src="~/AngularJs/Shared/angularErrorHandling.js"></script>
     <script src="~/AngularJs/Services/FormServices.js"></script>
-<script src="~/AngularJs/Apps/FormManagement/formManagementApp.js"></script>
+
 }

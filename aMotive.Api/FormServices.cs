@@ -64,9 +64,10 @@ namespace eMotive.Api
                 ? _formManager.FetchFormList()
                 : _formManager.FetchFormList(request.Ids);
 
-            var success = result.HasContent();
-
             var issues = _notificationService.FetchIssues(); //TODO: how to deal with errors when going directly into the api?? perhaps organise messages better?
+            var success = result.HasContent() || !issues.HasContent();
+
+            
 
             return new ServiceResult<IEnumerable<FormList>>
             {
@@ -75,6 +76,24 @@ namespace eMotive.Api
                 Errors = issues
             };
 
+        }
+        
+        public object Post(SaveFormList request)
+        {
+               int id;
+               var success = _formManager.CreateFormList(request.formList, out id);
+
+                if (success)
+                    request.formList.ID = id;
+
+                var issues = _notificationService.FetchIssues();
+
+                return new ServiceResult<FormList>
+                {
+                    Success = success,
+                    Result = request.formList,
+                    Errors = issues
+                };
         }
 
     }
