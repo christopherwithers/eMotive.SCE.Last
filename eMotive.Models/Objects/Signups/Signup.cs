@@ -15,6 +15,9 @@ namespace eMotive.Models.Objects.Signups
         public bool MergeReserve { get; set; }
         public bool AllowMultipleSignups { get; set; }
 
+        public bool PlacementTags { get; set; }
+        public bool DetailedPlacementText { get; set; }
+
         public string Description { get; set; }
 
         public ICollection<Slot> Slots { get; set; }

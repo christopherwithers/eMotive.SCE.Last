@@ -56,8 +56,11 @@
     <Compile Include="Interfaces\IRoleRepository.cs" />
     <Compile Include="Interfaces\ISessionRepository.cs" />
     <Compile Include="Interfaces\IUserRepository.cs" />
+    <Compile Include="Objects\Forms\Form.cs" />
+    <Compile Include="Objects\Forms\FormItem.cs" />
     <Compile Include="Objects\Forms\FormList.cs" />
     <Compile Include="Objects\Forms\FormListItem.cs" />
+    <Compile Include="Objects\Forms\FormType.cs" />
     <Compile Include="Objects\Menu\MenuItem.cs" />
     <Compile Include="Objects\MySqlFormRepository.cs" />
     <Compile Include="Objects\MySqlNewsRepository.cs" />

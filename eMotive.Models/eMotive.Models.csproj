@@ -78,8 +78,11 @@
     <Compile Include="Objects\Email\EmailSearch.cs" />
     <Compile Include="Objects\Enums.cs" />
     <Compile Include="Objects\FineUploader\FineUpload.cs" />
+    <Compile Include="Objects\Forms\Form.cs" />
+    <Compile Include="Objects\Forms\FormItem.cs" />
     <Compile Include="Objects\Forms\FormList.cs" />
     <Compile Include="Objects\Forms\FormListItem.cs" />
+    <Compile Include="Objects\Forms\FormType.cs" />
     <Compile Include="Objects\Menu\Menu.cs" />
     <Compile Include="Objects\News\NewsSearch.cs" />
     <Compile Include="Objects\News\NewsItem.cs" />

@@ -292,9 +292,13 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Content Include="AngularJs\Apps\FormManagement\formManagementApp.js" />
-    <Content Include="AngularJs\Apps\FormManagement\Templates\Create.html" />
-    <Content Include="AngularJs\Apps\FormManagement\Templates\Edit.html" />
     <Content Include="AngularJs\Apps\FormManagement\Templates\Home.html" />
+    <Content Include="AngularJs\Apps\FormManagement\Templates\Pages\Collection\Create.html" />
+    <Content Include="AngularJs\Apps\FormManagement\Templates\Pages\Collection\Edit.html" />
+    <Content Include="AngularJs\Apps\FormManagement\Templates\Pages\Form\Create.html" />
+    <Content Include="AngularJs\Apps\FormManagement\Templates\Pages\Form\Edit.html" />
+    <Content Include="AngularJs\Apps\FormManagement\Templates\Tabs\FormHome.html" />
+    <Content Include="AngularJs\Apps\FormManagement\Templates\Tabs\FormCollectionHome.html" />
     <Content Include="AngularJs\Apps\SignupManagement\SignupManagementApp.js" />
     <Content Include="AngularJs\Services\FormServices.js" />
     <Content Include="AngularJs\Services\SignupServices.js" />

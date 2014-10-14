@@ -109,7 +109,18 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                                     Name = "Pages",
                                     URL = Url.Action("Index", "Pages", new {area="Admin"}),//"/MMIAdmin/Admin/Pages/",
                                     Title = "Page Administration",
-                                    Icon = "<span class='icon-book'></span>"
+                                    Icon = "<span class='icon-book'></span>",
+                                    MenuItems = new []
+                                        {
+                                            new MenuItem
+                                            {
+                                                ID = 1,
+                                                Name = "Forms",
+                                                URL = Url.Action("Index", "Forms", new {area="Admin"}),//"/MMIAdmin/Admin/Users",
+                                                Title = "Form Administration",
+                                                Icon = "<span class='icon-file'></span>",
+                                            }
+                                        }
                                 },
                                 new MenuItem
                                 {
@@ -259,7 +270,18 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                                     Name = "Pages",
                                     URL = Url.Action("Index", "Pages", new {area="Admin"}),//"Admin/Pages/",
                                     Title = "Page Administration",
-                                    Icon = "<span class='icon-book'></span>"
+                                    Icon = "<span class='icon-book'></span>",
+                                    MenuItems = new []
+                                        {
+                                            new MenuItem
+                                            {
+                                                ID = 1,
+                                                Name = "Forms",
+                                                URL = Url.Action("Index", "Forms", new {area="Admin"}),//"/MMIAdmin/Admin/Users",
+                                                Title = "Form Administration",
+                                                Icon = "<span class='icon-file'></span>",
+                                            }
+                                        }
                                 },
                                 new MenuItem
                                 {

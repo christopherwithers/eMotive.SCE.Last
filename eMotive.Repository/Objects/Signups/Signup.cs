@@ -16,6 +16,9 @@ namespace eMotive.Repository.Objects.Signups
         public bool AllowMultipleSignups { get; set; }
         public bool IsTraining { get; set; }
 
+        public bool PlacementTags { get; set; }
+        public bool DetailedPlacementText { get; set; }
+
         public int IdGroup { get; set; }
 
         public string Description { get; set; }

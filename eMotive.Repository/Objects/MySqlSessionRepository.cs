@@ -75,7 +75,7 @@ namespace eMotive.Repository.Objects
 
                         //pull out any applicants assigned to any of the slot ids we have passed in
                        // sql = "SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate`FROM `UserHasSlots` a INNER JOIN `users` b ON a.id=b.id WHERE a.`idSlot` IN @ids;";
-                        sql = "SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate`FROM `UserHasSlots` a INNER JOIN `users` b ON a.idUser=b.id WHERE a.`idSlot` IN @ids;";
+                        sql = "SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate`FROM `UserHasSlots` a INNER JOIN `users` b ON a.idUser=b.id WHERE a.`idSlot` IN @ids ORDER BY `SignUpDate`, `idSlot` DESC;";
                         var userSignups = connection.Query<UserSignup>(sql, new { ids = qIds });
 
                         if (userSignups.HasContent())
@@ -157,7 +157,7 @@ namespace eMotive.Repository.Objects
 
                         //pull out any applicants assigned to any of the slot ids we have passed in
                         // sql = "SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate`FROM `UserHasSlots` a INNER JOIN `users` b ON a.id=b.id WHERE a.`idSlot` IN @ids;";
-                        sql = "SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate`FROM `UserHasSlots` a INNER JOIN `users` b ON a.idUser=b.id WHERE a.`idSlot` IN @ids;";
+                        sql = "SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate`FROM `UserHasSlots` a INNER JOIN `users` b ON a.idUser=b.id WHERE a.`idSlot` IN @ids ORDER BY `SignUpDate`, `idSlot` DESC;";
                         var userSignups = connection.Query<UserSignup>(sql, new { ids = qIds });
 
                         if (userSignups.HasContent())
@@ -239,7 +239,7 @@ namespace eMotive.Repository.Objects
 
                         //pull out any applicants assigned to any of the slot ids we have passed in
                         // sql = "SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate`FROM `UserHasSlots` a INNER JOIN `users` b ON a.id=b.id WHERE a.`idSlot` IN @ids;";
-                        sql = "SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate`FROM `UserHasSlots` a INNER JOIN `users` b ON a.idUser=b.id WHERE a.`idSlot` IN @ids;";
+                        sql = "SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate`FROM `UserHasSlots` a INNER JOIN `users` b ON a.idUser=b.id WHERE a.`idSlot` IN @ids ORDER BY `SignUpDate`, `idSlot` DESC;";
                         var userSignups = connection.Query<UserSignup>(sql, new { ids = qIds });
 
                         if (userSignups.HasContent())
@@ -371,7 +371,7 @@ namespace eMotive.Repository.Objects
                         //pull out any applicants assigned to any of the slot ids we have passed in
                         //    sql = string.Format("SELECT * FROM `{0}`.`applicant_has_slots` WHERE `idSlot` IN @ids;", DatabaseName);
 
-                        sql = @"SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate` FROM `UserHasSlots` a INNER JOIN `users` b ON a.idUser=b.id WHERE a.`idSlot` IN @ids;";
+                        sql = @"SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate` FROM `UserHasSlots` a INNER JOIN `users` b ON a.idUser=b.id WHERE a.`idSlot` IN @ids ORDER BY `SignUpDate`, `idSlot` DESC;";
 
                         var userSignups = connection.Query<UserSignup>(sql, new { ids = qIds });
 
@@ -427,7 +427,7 @@ namespace eMotive.Repository.Objects
                 {
                     connection.Open();
 
-                    var query = "UPDATE `signup` SET `Date`=@Date, `idGroup`=@idGroup,`AcademicYear`=@AcademicYear,`CloseDate`=@CloseDate,`Closed`=@Closed,`OverrideClose`=@OverrideClose,`MergeReserve`=@MergeReserve,`AllowMultipleSignups`=@AllowMultipleSignups,`Description`=@Description,`IsTraining`=@IsTraining WHERE `id`=@id;";
+                    var query = "UPDATE `signup` SET `Date`=@Date, `idGroup`=@idGroup,`AcademicYear`=@AcademicYear,`CloseDate`=@CloseDate,`Closed`=@Closed,`OverrideClose`=@OverrideClose,`MergeReserve`=@MergeReserve,`AllowMultipleSignups`=@AllowMultipleSignups,`Description`=@Description,`IsTraining`=@IsTraining, `PlacementTags`=@PlacementTags, `DetailedPlacementText`=@DetailedPlacementText WHERE `id`=@id;";
 
                     if (connection.Execute(query, _signup) > 0)
                     {

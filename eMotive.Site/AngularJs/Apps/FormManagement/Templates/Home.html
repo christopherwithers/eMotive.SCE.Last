@@ -1,32 +1,10 @@
 ﻿<div class="page-header">
-    <h2>Drop Down Admin</h2>
+    <h2>Form Admin</h2>
 </div>
 
 <div class="row">
-    <div class="offset1 span4">
-        <table class="table table-striped table-bordered table-responsive" ng-show="dropDownLists">
-            <tr>
-                <th>Name</th>
-                <th></th>
-            </tr>
-            <tr ng-repeat="dropDown in dropDownLists">
-                <td>{{dropDown.Name}}</td>
-                <td>
-                    <a href="#/Edit?Id={{dropDown.ID}}" class="btn btn-primary btn-small">Edit</a>
-                    <a href class="btn btn-danger btn-small">Delete</a>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <a href="#/Create" class="btn btn-primary btn-small">Create</a>
-                </td>
-            </tr>
-        </table>
-        
-        <div ng-hide ="dropDownLists">
-            <p>No drop down lists could be found.</p>
-
-            <a href="#/Create" class="btn btn-primary btn-small">Create a drop down List</a>
+    <div class="col-sm-offset-1 col-lg-7">
+        <div ng-model="tabs.activeTab" bs-tabs="tabs">
         </div>
     </div>
 </div>

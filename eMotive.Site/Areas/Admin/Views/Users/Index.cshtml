@@ -54,7 +54,7 @@
 
 @if (((User)ViewBag.LoggedInUser).Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
 {
-    <div  style="margin: 10px;"><!--<a href="Url.Action("Create")" class="btn">Create User</a> --> <a href="@Url.Action("CreateInterviewer")" class="btn">Create Interviewer</a></div>
+    <div  style="margin: 10px;"><!--<a href="Url.Action("Create")" class="btn">Create User</a> --> <a href="@Url.Action("Create")" class="btn">Create Admin</a> <a href="@Url.Action("CreateInterviewer")" class="btn">Create SCE</a> <a href="@Url.Action("Create")" class="btn">Create UCG</a> </div>
 }
 @if (!Model.Users.HasContent())
 {

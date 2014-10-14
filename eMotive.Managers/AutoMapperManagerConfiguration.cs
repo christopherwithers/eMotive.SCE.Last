@@ -84,6 +84,15 @@ namespace eMotive.Managers
 
         private static void ConfigureFormMapping()
         {
+            Mapper.CreateMap<Form, mForm.Form>();
+            Mapper.CreateMap<mForm.Form, Form>();
+
+            Mapper.CreateMap<FormItem, mForm.FormItem>();
+            Mapper.CreateMap<mForm.FormItem, FormItem>();
+
+            Mapper.CreateMap<FormType, mForm.FormType>();
+            Mapper.CreateMap<mForm.FormType, FormType>();
+
             Mapper.CreateMap<FormList, mForm.FormList>();
             Mapper.CreateMap<mForm.FormList, FormList>();
 
