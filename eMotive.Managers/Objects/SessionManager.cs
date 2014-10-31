@@ -218,7 +218,7 @@ namespace eMotive.Managers.Objects
         {
             var success = signupRepository.Save(Mapper.Map<Models.Objects.SignupsMod.Signup, rep.Signup>(signup));
 
-            if(!success)
+            if (!success)
                 notificationService.AddIssue("The session changes could not be saved.");
 
             return success;
@@ -863,50 +863,54 @@ namespace eMotive.Managers.Objects
 
                 if (signupRepository.SignupToSlot(_slotId, user.ID, signupDate, out id))
                 {
-                    //+1 to account for the signup we are currently processing
-                    var reserveSignup = slot.ApplicantsSignedUp.HasContent() && slot.ApplicantsSignedUp.Count() + 1 > slot.TotalPlacesAvailable;
-                    // slot.ApplicantsSignedUp.Single(n => n.ID == 0).ID = id;
-                    var replacements = new Dictionary<string, string>(4)
+                    if (signup.Group.EnableEmails)
                     {
-                        {"#forename#", user.Forename},
-                        {"#surname#", user.Surname},
-                        {"#SignupDate#", signup.Date.ToString("dddd d MMMM yyyy")},
-                        {"#SlotDescription#", slot.Description},
-                        {"#SignupDescription#", signup.Description},
-                        {"#GroupDescription#", signup.Group.Name},
-                        {"#username#", user.Username},
-                        {"#sitename#", configurationService.SiteName()},
-                        {"#siteurl#", configurationService.SiteURL()}
-                    };
-
-                    // string key = interestedSlot ? "InterestedSignup" : "UserSessionSignup";
-
-
-                    var key = string.Empty;
-
-                    if (user.Roles.Any(n => n.Name == "Applicant"))
-                        key = "ApplicantSessionSignup";
-
-                    if (user.Roles.Any(n => n.Name == "Interviewer"))
-                    {
-                        if (signup.Group.Name == "Observer")
+                        //+1 to account for the signup we are currently processing
+                        var reserveSignup = slot.ApplicantsSignedUp.HasContent() &&
+                                            slot.ApplicantsSignedUp.Count() + 1 > slot.TotalPlacesAvailable;
+                        // slot.ApplicantsSignedUp.Single(n => n.ID == 0).ID = id;
+                        var replacements = new Dictionary<string, string>(4)
                         {
-                            key = "ObserverSessionSignup";
-                        }
-                        else
+                            {"#forename#", user.Forename},
+                            {"#surname#", user.Surname},
+                            {"#SignupDate#", signup.Date.ToString("dddd d MMMM yyyy")},
+                            {"#SlotDescription#", slot.Description},
+                            {"#SignupDescription#", signup.Description},
+                            {"#GroupDescription#", signup.Group.Name},
+                            {"#username#", user.Username},
+                            {"#sitename#", configurationService.SiteName()},
+                            {"#siteurl#", configurationService.SiteURL()}
+                        };
+
+                        // string key = interestedSlot ? "InterestedSignup" : "UserSessionSignup";
+
+
+                        var key = string.Empty;
+
+                        if (user.Roles.Any(n => n.Name == "Applicant"))
+                            key = "ApplicantSessionSignup";
+
+                        if (user.Roles.Any(n => n.Name == "Interviewer"))
                         {
+                            if (signup.Group.Name == "Observer")
+                            {
+                                key = "ObserverSessionSignup";
+                            }
+                            else
+                            {
 
-                            key = reserveSignup ? "ReserveSessionSignup" : "InterviewerSessionSignup";
+                                key = reserveSignup ? "ReserveSessionSignup" : "InterviewerSessionSignup";
+                            }
                         }
-                    }
 
 
-                    if (emailService.SendMail(key, user.Email, replacements))
-                    {
-                        emailService.SendEmailLog(key, user.Username);
+                        if (emailService.SendMail(key, user.Email, replacements))
+                        {
+                            emailService.SendEmailLog(key, user.Username);
+                            return true;
+                        }
                         return true;
                     }
-                    return true;
                 }
 
                 notificationService.AddError("An error occured. ");
@@ -949,19 +953,20 @@ namespace eMotive.Managers.Objects
 
                 if (signupRepository.CancelSignupToSlot(_slotId, user.ID))
                 {
-
-                    var userIndex = slot.ApplicantsSignedUp.FindIndex(n => n.User.ID == user.ID) + 1;
-
-                    var reserveCancel = userIndex > slot.TotalPlacesAvailable;
-                    /*                    var userSignup = signup.Slots.SingleOrDefault(n => n.ID == _slotId).ApplicantsSignedUp.SingleOrDefault(n => n.Applicant.Username == _username);
-
-                    signup.Slots.SingleOrDefault(n => n.ID == _slotId).ApplicantsSignedUp.Remove(userSignup);
-*/
-                    /*if (slot.ApplicantsSignedUp().Count() >= slot.ApplicantsSignedUp + slot.ReservePlaces)
+                    if (signup.Group.EnableEmails)
                     {
+                        var userIndex = slot.ApplicantsSignedUp.FindIndex(n => n.User.ID == user.ID) + 1;
+
+                        var reserveCancel = userIndex > slot.TotalPlacesAvailable;
+                        /*                    var userSignup = signup.Slots.SingleOrDefault(n => n.ID == _slotId).ApplicantsSignedUp.SingleOrDefault(n => n.Applicant.Username == _username);
+
+                        signup.Slots.SingleOrDefault(n => n.ID == _slotId).ApplicantsSignedUp.Remove(userSignup);
+    */
+                        /*if (slot.ApplicantsSignedUp().Count() >= slot.ApplicantsSignedUp + slot.ReservePlaces)
+                        {
                         
-                    }*/
-                    var replacements = new Dictionary<string, string>(4)
+                        }*/
+                        var replacements = new Dictionary<string, string>(4)
                     {
                         {"#forename#", user.Forename},
                         {"#surname#", user.Surname},
@@ -974,43 +979,43 @@ namespace eMotive.Managers.Objects
                         {"#siteurl#", configurationService.SiteURL()}
                     };
 
-                    //  string key = "UserSessionCancel";
+                        //  string key = "UserSessionCancel";
 
-                    var key = string.Empty;
+                        var key = string.Empty;
 
-                    if (user.Roles.Any(n => n.Name == "Applicant"))
-                        key = "ApplicantSessionCancel";
+                        if (user.Roles.Any(n => n.Name == "Applicant"))
+                            key = "ApplicantSessionCancel";
 
-                    if (user.Roles.Any(n => n.Name == "Interviewer"))
-                    {
-                        if (signup.Group.Name == "Observer")
-                            key = "ObserverSessionCancel";
-                        else
-                            key = reserveCancel ? "ReserveSessionCancel" : "InterviewerSessionCancel";
-                    }
-
-
-                    if (emailService.SendMail(key, user.Email, replacements))
-                    {
-                        emailService.SendEmailLog(key, user.Username);
-
-
-                        if (BumpUser)
+                        if (user.Roles.Any(n => n.Name == "Interviewer"))
                         {
-                            var users = slot.ApplicantsSignedUp.Select(n => n).OrderBy(n => n.SignupDate).ToArray();
-
-                            var UserToBump = users[slot.TotalPlacesAvailable /*+ slot.ReservePlaces*/].User;
-
-
-                            key = "SlotUpgrade";
-
-                            if (emailService.SendMail(key, UserToBump.Email, replacements))
-                            {
-                                emailService.SendEmailLog(key, UserToBump.Username);
-                                return true;
-                            }
+                            if (signup.Group.Name == "Observer")
+                                key = "ObserverSessionCancel";
+                            else
+                                key = reserveCancel ? "ReserveSessionCancel" : "InterviewerSessionCancel";
                         }
 
+
+                        if (emailService.SendMail(key, user.Email, replacements))
+                        {
+                            emailService.SendEmailLog(key, user.Username);
+
+
+                            if (BumpUser)
+                            {
+                                var users = slot.ApplicantsSignedUp.Select(n => n).OrderBy(n => n.SignupDate).ToArray();
+
+                                var UserToBump = users[slot.TotalPlacesAvailable /*+ slot.ReservePlaces*/].User;
+
+
+                                key = "SlotUpgrade";
+
+                                if (emailService.SendMail(key, UserToBump.Email, replacements))
+                                {
+                                    emailService.SendEmailLog(key, UserToBump.Username);
+                                    return true;
+                                }
+                            }
+                        }
 
 
 

@@ -467,7 +467,7 @@ namespace eMotive.Repository.Objects
             {
                 connection.Open();
 
-                const string query = "INSERT INTO `groups` (`Name`, `AllowMultipleSignups`, `Description`) VALUES (@name, @allowMultipleSignups, @description);";
+                const string query = "INSERT INTO `groups` (`Name`, `AllowMultipleSignups`, `Description`, `EnableEmails`) VALUES (@name, @allowMultipleSignups, @description, @EnableEmails);";
 
                 return connection.Execute(query, new
                 {
@@ -484,7 +484,7 @@ namespace eMotive.Repository.Objects
             {
                 connection.Open();
 
-                const string query = "UPDATE `groups` SET `Name`=@name, `AllowMultipleSignups`=@allowMultipleSignups, `Description`=@description WHERE `Id`=@id;";
+                const string query = "UPDATE `groups` SET `Name`=@name, `AllowMultipleSignups`=@allowMultipleSignups, `Description`=@description, `EnableEmails` WHERE `Id`=@id;";
 
                 return connection.Execute(query, new
                 {
