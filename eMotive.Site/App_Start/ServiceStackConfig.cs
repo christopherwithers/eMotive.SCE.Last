@@ -1,4 +1,8 @@
-﻿using System.Web.Mvc;
+﻿using System.Collections.Generic;
+using System.Net;
+using System.Web.Mvc;
+using System.Web.Security;
+using eMotive.MMI.SignalR;
 using eMotive.SCE.Controllers;
 using eMotive.IoCBindings.Funq;
 using eMotive.Models.Validation.Account;
@@ -7,6 +11,7 @@ using Funq;
 using ServiceStack.CacheAccess;
 using ServiceStack.CacheAccess.Providers;
 using ServiceStack.Common;
+using ServiceStack.Common.Web;
 using ServiceStack.Configuration;
 using ServiceStack.Mvc;
 using ServiceStack.ServiceHost;
@@ -27,52 +32,75 @@ namespace eMotive.SCE
         {
             FunqBindings.Configure(container);
 
-            container.Register<ICacheClient>(new MemoryCacheClient());
+            container.Register<ICacheClient>(new MemoryCacheClient
+            {
+                FlushOnDispose = false
+            });
             container.Register<ISessionFactory>(c => new SessionFactory(c.Resolve<ICacheClient>()));
 
-            
+            SetConfig(new EndpointHostConfig { DebugMode = true });
             JsConfig.DateHandler = JsonDateHandler.ISO8601;
 
-
-       //     SetConfig(new EndpointHostConfig
-           // {
-              //  ServiceStackHandlerFactoryPath = "services",
-              //  EnableFeatures = Feature.All.Remove(Feature.Metadata)
-          //  });
-          //  SetConfig(new EndpointHostConfig
-           // {
-             //   
-           // });
-        //    AuthService.Init(() => new AuthUserSession(), new IAuthProvider[] {new CredentialsAuthProvider()});
-
-
-          //  Plugins.Add(new ValidationFeature());
             FluentValidationModelValidatorProvider.Configure();
-        //    container.RegisterValidators(typeof(Models.Validation.User.UserValidator).Assembly);
-            //container.Register(new LoginValidator());
-            /*Plugins.Add(new AuthFeature(() => new AuthUserSession(),
-                    new IAuthProvider[] { 
-                    new BasicAuthProvider(), //Sign-in with Basic Auth
-                    new CredentialsAuthProvider(), //HTML Form post of UserName/Password credentials
-                  }));*/
-            /*    var appSettings = new AppSettings();
-            Plugins.Add(new AuthFeature(this, new CustomUserSession(), 
-                new IAuthProvider[]
-                {
-                    new CredentialsAuthProvider(appSettings), 
-                }));*/
+
+            Plugins.Add(new AuthFeature(
+                            () => new AuthUserSession(),
+                            new IAuthProvider[] { new CustomCredentialsAuthProvider() }
+                        ));
+
 
             ControllerBuilder.Current.SetControllerFactory(new FunqControllerFactory(container));
             ServiceStackController.CatchAllController = reqCtx => container.TryResolve<AccountController>();
         }
-    }
-    /*
-    public class CustomCredentialsAuthProvider : CredentialsAuthProvider
-    {
-        public override bool TryAuthenticate(IServiceBase authService,
-            string userName, string password)
+
+        private class CustomCredentialsAuthProvider : CredentialsAuthProvider
         {
-            return userName == "james" && password == "test";
+            public override object Authenticate(IServiceBase authService, IAuthSession session, Auth request)
+            {
+                var userName = request.UserName;
+                var password = request.Password;
+
+                if (!LoginMatchesSession(session, userName))
+                {
+                    authService.RemoveSession();
+                    session = authService.GetSession();
+                }
+
+                if (TryAuthenticate(authService, userName, password))
+                {
+                    authService.SaveSession(session, SessionExpiry);
+                    if (session.UserAuthName == null)
+                        session.UserAuthName = userName;
+                    OnAuthenticated(authService, session, null, null);
+
+                    return new AuthResponse
+                    {
+                        UserName = userName,
+                        SessionId = session.Id,
+                        ReferrerUrl = RedirectUrl
+                    };
+                }
+
+                throw new HttpError(HttpStatusCode.BadRequest, "400", "wrong credentials");
+
+            }
+
+            public override bool TryAuthenticate(IServiceBase authService, string userName, string password)
+            {//TODO: As we're calling this when authed, we don't really need to re-auth?
+              //  if (!Membership.ValidateUser(userName, password)) return false;
+
+                var session = (AuthUserSession)authService.GetSession(false);//(AuthUserSession)
+
+                session.UserAuthId = userName;
+                session.IsAuthenticated = true;
+
+                // add roles 
+             /*   session.Roles = new List<string>();
+                if (session.UserAuthId == "admin") session.Roles.Add(RoleNames.Admin);
+                session.Roles.Add("User");*/
+
+                return true;
+            }
         }
-    }*/
+    }
 }

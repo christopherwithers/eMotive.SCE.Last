@@ -58,7 +58,7 @@ namespace eMotive.Api
     }
 
 
-  //  [Authenticate] 
+    [Authenticate] 
     public class SessionService : Service
     {
         private readonly ISessionManager _sessionManager;
@@ -132,7 +132,7 @@ namespace eMotive.Api
                 Errors = issues
             };
         }
-
+        
         public object Post(SlotSignup request)
         {
             if (_sessionManager.SignupToSlot(request.IdSignup, request.IdSlot, request.Username))
