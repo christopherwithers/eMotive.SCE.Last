@@ -1,4 +1,5 @@
-﻿@using Extensions
+﻿@using System.Linq
+@using Extensions
 @using eMotive.Models.Objects.Users
 @using eMotive.SCE.Common.Helpers
 @using eMotive.Models.Objects.Search
@@ -102,7 +103,7 @@ else
                             <ul class="dropdown-menu">
                                 @if(((User)ViewBag.LoggedInUser).Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
                                 {
-                                    if (user.Roles.Any(n => n.Name == "Interviewer"))
+                                    if (user.Roles.Any(n => n.Name == "SCE"))
                                     {
                                         <li><a href="@Url.Action("EditUser", new {username = user.Username})">Edit User</a></li>
                                     }
@@ -118,15 +119,10 @@ else
                                 {
                                     <li><a href="#" onclick="UserActions.FetchNotes('@user.Username')">Notes</a></li>
                                 }
-                                @if (user.Roles.Any(n => n.Name == "Interviewer"))
+                                @if (user.Roles.Any(n => n.Name == "SCE"))
                                 {
                                     <!-- <li>Html.ActionLink("Create Applicant Letter", "GenerateApplicantLetter", "Users", new {area = "admin", username = user.Username}, null)</li> -->
                                     <li>@Html.ActionLink("Third Party Signup", "UserSessions", "Signups", new { area = "admin", username = user.Username }, null)</li>
-                                }
-                                @if (user.Roles.Any(n => n.Name == "Applicant"))
-                                {
-                                    <!-- <li>Html.ActionLink("Create Applicant Letter", "GenerateApplicantLetter", "Users", new {area = "admin", username = user.Username}, null)</li> -->
-                                    <li><a href="#" onclick="UserActions.FetchApplicantData('@user.Username')">View Applicant Details</a></li>
                                 }
                                 @if (((User) ViewBag.LoggedInUser).Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
                                 {

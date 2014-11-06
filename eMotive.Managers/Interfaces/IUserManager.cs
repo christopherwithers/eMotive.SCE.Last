@@ -20,10 +20,6 @@ namespace eMotive.Managers.Interfaces
         IEnumerable<User> Fetch(IEnumerable<int> _ids);
         IEnumerable<User> Fetch(IEnumerable<string> _usernames);
 
-        bool CreateApplicantAccounts(List<ApplicantUploadData> _applicantData, IEnumerable<int> _groupIds);
-
-        IEnumerable<ApplicantData> FetchApplicantData(string _username);
-        IDictionary<string, List<ApplicantData>> FetchApplicantData(IEnumerable<string> _username);
 
         bool Create(User _user, out int _id);
         bool Create(User _user, IEnumerable<int> _groupIds);
@@ -36,8 +32,6 @@ namespace eMotive.Managers.Interfaces
         bool UpdateSCE(SCEData _sce);
 
         Profile FetchProfile(string _username);
-
-        bool SaveApplicantData(IEnumerable<ApplicantData> _applicantData);
 
         SCEData FetchSCEData(int _id);
         IEnumerable<SCEData> FetchAllSceData();

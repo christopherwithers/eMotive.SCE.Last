@@ -87,54 +87,6 @@ namespace eMotive.Managers.Objects
             return Mapper.Map<IEnumerable<repUsers.User>, IEnumerable<User>>(userRep.Fetch(_usernames));
         }
 
-        public IEnumerable<ApplicantData> FetchApplicantData(string _username)
-        {
-            return Mapper.Map<IEnumerable<repUsers.ApplicantData>, IEnumerable<ApplicantData>>(userRep.FetchApplicantData(_username));
-        }
-
-        public IDictionary<string, List<ApplicantData>> FetchApplicantData(IEnumerable<string> _usernames)
-        {
-            return Mapper.Map<IDictionary<string, List<repUsers.ApplicantData>>, IDictionary<string, List<ApplicantData>>>(userRep.FetchApplicantData(_usernames));
-        }
-
-        public bool CreateApplicantAccounts(List<ApplicantUploadData> _applicantData, IEnumerable<int> _groupIds)
-        {
-
-            var users = Fetch(_applicantData.Select(n => n.PersonID));
-
-            if (users.HasContent())
-                _applicantData.RemoveAll(n => users.Any(m => m.Username == n.PersonID));
-
-            if (!_applicantData.HasContent())
-                return false;
-
-            var applicantDict = userRep.FetchApplicantData(_applicantData.Select(n => n.PersonID));
-
-           // var newUsers = new List<User>();
-
-            foreach (var applicant in applicantDict)
-            {
-                foreach (var applicantData in applicant.Value)
-                {
-                    var newUser = new User
-                    {
-                        Archived = false,
-                        Email = applicantData.EmailAddress,
-                        Enabled = true,
-                        Forename = applicantData.Firstname,
-                        Surname = applicantData.Surname,
-                        Roles = new [] {new Role{ Name = "Applicant", ID = 4, Colour = "63C763"} },
-                        Username = applicantData.PersonalID
-                    };
-                    int id;
-                    Create(newUser, _groupIds);
-                    break;
-                }
-            }
-
-            return true;
-        }
-
         public bool Create(User _user, IEnumerable<int> _groupIds)
         {
             var user = Mapper.Map<User, repUsers.User>(_user);
@@ -457,10 +409,6 @@ namespace eMotive.Managers.Objects
             return Mapper.Map <IEnumerable<repUsers.SCEData>, IEnumerable<SCEData>>(userRep.FetchAllSceData());
         }
 
-        public bool SaveApplicantData(IEnumerable<ApplicantData> _applicantData)
-        {
-            return userRep.SaveApplicantData(Mapper.Map<IEnumerable<ApplicantData>, IEnumerable<repUsers.ApplicantData>> (_applicantData));
-        }
 
         public SearchResult DoSearch(BasicSearch _search)
         {

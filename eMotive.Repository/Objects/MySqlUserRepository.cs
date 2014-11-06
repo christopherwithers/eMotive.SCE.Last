@@ -249,57 +249,6 @@ namespace eMotive.Repository.Objects
             }
         }
 
-        public bool SaveApplicantData(IEnumerable<ApplicantData> _applicantData)
-        {
-            using (var connection = new MySqlConnection(connectionString))
-            {
-                using (var transactionScope = new TransactionScope())
-                {
-                    connection.Open();
-                    /*            using (var connection = new MySqlConnection(connectionString))
-            {
-                const string sql = "INSERT INTO `UserHasRoles` (`UserId`, `RoleId`) VALUES (@idUser, @idRole);";
-
-                return connection.Execute(sql, new {Enumerable = _ids.Select(n => new {idUser = _id, idRole = n}) }) > 0;
-            }*/
-                    const string sql = "INSERT INTO `applicantReference` (`TermCode`, `ApplicationDate`, `ApplicantId`, `PersonalID`, `ApplicantPrefix`, `Surname`, `FirstName`, `DateOfBirth`, `Age`, `Gender`, `DisabilityCode`, `DisabilityDesc`, `ResidenceCode`, `NationalityDesc`, `CorrespondenceAddr1`, `CorrespondenceAddr2`, `CorrespondenceAddr3`, `CorrespondenceCity`, `CorrespondenceNationDesc`, `CorrespondencePostcode`, `EmailAddress`, `PreviousSchoolDesc`, `SchoolAddressCity`, `SchoolLEADescription`) VALUES (@TermCode, @ApplicationDate, @ApplicantId, @PersonalID, @ApplicantPrefix, @Surname, @FirstName, @DateOfBirth, @Age, @Gender, @DisabilityCode, @DisabilityDesc, @ResidenceCode, @NationalityDesc, @CorrespondenceAddr1, @CorrespondenceAddr2, @CorrespondenceAddr3, @CorrespondenceCity, @CorrespondenceNationDesc, @CorrespondencePostcode, @EmailAddress, @PreviousSchoolDesc, @SchoolAddressCity, @SchoolLEADescription);";
-
-                    var success = connection.Execute(sql, _applicantData) > 0;
-
-                    transactionScope.Complete();
-
-                    return success;
-                }
-            }
-        }
-
-        public IDictionary<string, List<ApplicantData>> FetchApplicantData(IEnumerable<string> _usernames)
-        {
-            using (var connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-                var sql = "SELECT * FROM `applicantReference` WHERE `PersonalID` IN @usernames;";
-
-                var applicants = connection.Query<ApplicantData>(sql, new {usernames = _usernames});
-
-                if (!applicants.HasContent())
-                    return null;
-
-                return applicants.GroupBy(m => m.PersonalID).ToDictionary(k => k.Key, v => v.ToList());
-            }
-        }
-
-        public IEnumerable<ApplicantData> FetchApplicantData(string _username)
-        {
-            using (var connection = new MySqlConnection(connectionString))
-            {
-                connection.Open();
-                var sql = "SELECT * FROM `applicantReference` WHERE `PersonalID`=@username;";
-
-                return connection.Query<ApplicantData>(sql, new { username = _username });
-            }
-        }
-
         public bool Create(User _user, out int _id)
         {
             using (var connection = new MySqlConnection(connectionString))
@@ -359,7 +308,7 @@ namespace eMotive.Repository.Objects
 
                     var oldRoles = connection.Query<int>(sql, new { UserId = _user.ID });
 
-                    var enumerable = oldRoles as int[] ?? oldRoles.ToArray();
+                   // var enumerable = oldRoles as int[] ?? oldRoles.ToArray();
                   //  if (!enumerable.HasContent())
                   //  {
                      //   sql = "INSERT INTO `UserHasRoles` (`UserID`, `RoleId`) VALUES (@UserId, @RoleId);";
@@ -368,15 +317,15 @@ namespace eMotive.Repository.Objects
                    // }
                    // else
                     // {var toDelete = enumerable.Where(n => !_user.Roles.Any(m => m.ID == n));
-                        var toDelete = enumerable.Where(n => _user.Roles.All(m => m.ID != n));
-                        var toUpdate = _user.Roles.Where(n => !enumerable.Any(m => m == n.ID));
+                    var toDelete = oldRoles.Where(n => _user.Roles.All(m => m.ID != n));
+                    var toUpdate = _user.Roles.Where(n => !oldRoles.Any(m => m == n.ID));
 
-                        var delete = toDelete as int[] ?? toDelete.ToArray();
-                        if (delete.HasContent())
+                 //       var delete = toDelete as int[] ?? toDelete.ToArray();
+                    if (toDelete.HasContent())
                         {
                             sql = "DELETE FROM `UserHasRoles` WHERE `RoleId` IN @roleIds AND `UserId` = @UserId;";
 
-                            success = connection.Execute(sql, new {roleIds = delete, UserId = _user.ID}) > 0;
+                            success = connection.Execute(sql, new { roleIds = toDelete, UserId = _user.ID }) > 0;
                         }
 
                         var update = toUpdate as Role[] ?? toUpdate.ToArray();

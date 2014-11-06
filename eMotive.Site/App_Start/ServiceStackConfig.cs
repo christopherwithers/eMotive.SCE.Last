@@ -38,7 +38,7 @@ namespace eMotive.SCE
             });
             container.Register<ISessionFactory>(c => new SessionFactory(c.Resolve<ICacheClient>()));
 
-            SetConfig(new EndpointHostConfig { DebugMode = true });
+          //  SetConfig(new EndpointHostConfig { DebugMode = true });
             JsConfig.DateHandler = JsonDateHandler.ISO8601;
 
             FluentValidationModelValidatorProvider.Configure();

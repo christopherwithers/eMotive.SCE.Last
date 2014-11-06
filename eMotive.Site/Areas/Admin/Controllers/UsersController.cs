@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Security.Claims;
 using System.Web;
 using System.Web.Mvc;
 using DDay.iCal;
@@ -35,15 +34,17 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         private readonly IRoleManager roleManager;
         private readonly ISessionManager signupManager;
         private readonly IGroupManager groupManager;
+        private readonly IFormManager formManager;
 
         private readonly Dictionary<string,string> searchFilter;
-        public UsersController(IUserManager _userManager, IRoleManager _roleManager, ISessionManager _signupManager, IGroupManager _groupManager)
+        public UsersController(IUserManager _userManager, IRoleManager _roleManager, ISessionManager _signupManager, IGroupManager _groupManager, IFormManager _formManager)
         {
             userManager = _userManager;
             roleManager = _roleManager;
             signupManager = _signupManager;
 
             groupManager = _groupManager;
+            formManager = _formManager;
 
             searchFilter = new Dictionary<string, string> { { "Type", "User" } };
         }
@@ -233,7 +234,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                         Links = new[]
                             {
                                 new SuccessView.Link {Text = string.Format("Edit {0}", sce.Username), URL = @Url.Action("EditUser", "Users", new {username = sce.Username})},
-                                new SuccessView.Link {Text = "Return to Users Home", URL = "/MMI/Admin/Users"}
+                                new SuccessView.Link {Text = "Return to Users Home", URL = @Url.Action("Index", "Users")}
                             }
                     };
 
@@ -291,7 +292,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                         Links = new[]
                             {
                                 new SuccessView.Link {Text = string.Format("Edit {0}", user.Username), URL = @Url.Action("Edit", "Users", new {username = user.Username})},
-                                new SuccessView.Link {Text = "Return to Users Home", URL = "/MMI/Admin/Users"}
+                                new SuccessView.Link {Text = "Return to Users Home", URL = @Url.Action("Index", "Users")}
                             }
                     };
 
@@ -329,12 +330,13 @@ namespace eMotive.SCE.Areas.Admin.Controllers
             sce.Email = user.Email;
             sce.Enabled = user.Enabled;
             var allGroups = groupManager.FetchGroups();
-            var dropDowns = new SCEFormData();
-            ViewBag.GradesDropDown = dropDowns.Grades;
-            ViewBag.TrustsDropDown = dropDowns.Trusts;
+
+            ViewBag.GradesDropDown = formManager.FetchFormList("Grade").Collection.ToDictionary(k => k.Value, v => v.Text);
+            ViewBag.TrustsDropDown = formManager.FetchFormList("Trusts").Collection.ToDictionary(k => k.Value, v => v.Text);
             ViewBag.GroupDropDown = allGroups;
 
             sce.AllGroups = allGroups;
+            ViewBag.LoggedInUser = userManager.Fetch(User.Identity.Name);
 
             return View(sce);
         }
@@ -353,7 +355,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                         Links = new[]
                             {
                                 new SuccessView.Link {Text = string.Format("Edit {0}", sce.Username), URL = @Url.Action("EditUser", "Users", new {username = sce.Username})},
-                                new SuccessView.Link {Text = "Return to Users Home", URL = "/MMI/Admin/Users"}
+                                new SuccessView.Link {Text = "Return to Users Home", URL = @Url.Action("Index", "Users")}
                             }
                     };
 
@@ -372,9 +374,9 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                 }
             }
             var allGroups = groupManager.FetchGroups();
-            var dropDowns = new SCEFormData();
-            ViewBag.GradesDropDown = dropDowns.Grades;
-            ViewBag.TrustsDropDown = dropDowns.Trusts;
+
+            ViewBag.GradesDropDown = formManager.FetchFormList("Grade").Collection.ToDictionary(k => k.Value, v => v.Text);
+            ViewBag.TrustsDropDown = formManager.FetchFormList("Trusts").Collection.ToDictionary(k => k.Value, v => v.Text);
             ViewBag.GroupDropDown = allGroups;
             sce.AllGroups = allGroups;
 
@@ -423,7 +425,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                         Links = new[]
                             {
                                 new SuccessView.Link {Text = string.Format("Edit {0}", user.Username), URL = @Url.Action("Edit", "Users", new {username = user.Username})},
-                                new SuccessView.Link {Text = "Return to Users Home", URL = "/MMI/Admin/Users"}
+                                new SuccessView.Link {Text = "Return to Users Home", URL = @Url.Action("Index", "Users")}
                             }
                     };
 
@@ -443,32 +445,6 @@ namespace eMotive.SCE.Areas.Admin.Controllers
             }
 
             return View(user);
-        }
-
-        [AjaxOnly]
-        public CustomJsonResult FetchApplicantData(string username)
-        {
-            var data = userManager.FetchApplicantData(username);
-            var success = data.HasContent();
-            var errors = !success ? NotificationService.FetchIssues() : new string[] { };
-
-            return new CustomJsonResult
-            {
-                Data = new { success = success, message = errors, results = data }
-            };
-        }
-
-        [AjaxOnly]
-        public CustomJsonResult FetchApplicantSignups(string username)
-        {
-            var data = signupManager.FetchHomeView(username);
-            var success = data != null;
-            var errors = !success ? NotificationService.FetchIssues() : new string[] { };
-
-            return new CustomJsonResult
-            {
-                Data = new { success = success, message = errors, results = data }
-            };
         }
 
         [AjaxOnly]
