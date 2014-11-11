@@ -3,7 +3,7 @@ using ServiceStack.FluentValidation.Attributes;
 
 namespace eMotive.Models.Objects.Email
 {
-    [Validator(typeof(EmailValidator))]
+    [Validator(typeof (EmailValidator))]
     public class Email
     {
         public int ID { get; set; }
@@ -11,5 +11,6 @@ namespace eMotive.Models.Objects.Email
         public string Title { get; set; }
         public string Message { get; set; }
         public string Description { get; set; }
+        public bool Custom { get; set; }
     }
 }

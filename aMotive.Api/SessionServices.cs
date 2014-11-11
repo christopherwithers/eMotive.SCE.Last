@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using eMotive.Managers.Interfaces;
 using eMotive.Managers.Objects.Search;
@@ -57,6 +58,11 @@ namespace eMotive.Api
         public string Username { get; set; }
     }
 
+    [Route("/Sessions/Signups/Emails/StandDown", "POST")]
+    public class StandDownExaminers
+    {
+    }
+
 
     [Authenticate] 
     public class SessionService : Service
@@ -104,6 +110,29 @@ namespace eMotive.Api
             {
                 Success = success,
                 Result = result,
+                Errors = issues
+            };
+        }
+
+        public object Post(StandDownExaminers request)
+        {
+            if (_sessionManager.StandDownExaminers())
+            {
+                return new ServiceResult<bool>
+                {
+                    Success = true,
+                    Result = true,
+                    Errors = null
+                };
+            }
+
+            var issues = NotificationService.FetchIssues();
+
+            return new ServiceResult<bool>
+            {
+
+                Success = false,
+                Result = false,
                 Errors = issues
             };
         }

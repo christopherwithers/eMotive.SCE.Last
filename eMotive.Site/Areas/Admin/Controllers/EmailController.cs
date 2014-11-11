@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using eMotive.Managers.Interfaces;
 using eMotive.Models.Objects.Email;
@@ -57,6 +59,71 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         public ActionResult Create()
         {
             return View(emailService.New());
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult SendCustom(string Key)
+        {
+            switch (Key)
+            {
+                case "StandDownExaminers":
+                    StandDownExaminers();
+                    break;
+                case "ExaminerEmailReminder":
+                    ExaminerEmailReminder();
+                    break;
+
+            }
+            return View();
+        }
+
+        private bool StandDownExaminers()
+        {
+            
+            /*
+            var replacements = new Dictionary<string, string>(4)
+                        {
+                            {"#forename#", user.Forename},
+                            {"#surname#", user.Surname},
+                            {"#SignupDate#", signup.Date.ToString("dddd d MMMM yyyy")},
+                            {"#SlotDescription#", slot.Description},
+                            {"#SignupDescription#", signup.Description},
+                            {"#GroupDescription#", signup.Group.Name},
+                            {"#username#", user.Username},
+                            {"#sitename#", configurationService.SiteName()},
+                            {"#siteurl#", configurationService.SiteURL()}
+                        };
+            if (emailService.SendMail(key, user.Email, replacements))
+            {
+                emailService.SendEmailLog(key, user.Username);
+                return true;
+            }
+            return false;*/
+            throw new NotImplementedException();
+        }
+
+        private bool ExaminerEmailReminder()
+        {
+/*            var replacements = new Dictionary<string, string>(4)
+                        {
+                            {"#forename#", user.Forename},
+                            {"#surname#", user.Surname},
+                            {"#SignupDate#", signup.Date.ToString("dddd d MMMM yyyy")},
+                            {"#SlotDescription#", slot.Description},
+                            {"#SignupDescription#", signup.Description},
+                            {"#GroupDescription#", signup.Group.Name},
+                            {"#username#", user.Username},
+                            {"#sitename#", configurationService.SiteName()},
+                            {"#siteurl#", configurationService.SiteURL()}
+                        };
+            if (emailService.SendMail(key, user.Email, replacements))
+            {
+                emailService.SendEmailLog(key, user.Username);
+                return true;
+            }
+            return false;*/
+            throw new NotImplementedException();
         }
 
         [HttpPost]

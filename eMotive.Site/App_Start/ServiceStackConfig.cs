@@ -2,7 +2,6 @@
 using System.Net;
 using System.Web.Mvc;
 using System.Web.Security;
-using eMotive.MMI.SignalR;
 using eMotive.SCE.Controllers;
 using eMotive.IoCBindings.Funq;
 using eMotive.Models.Validation.Account;

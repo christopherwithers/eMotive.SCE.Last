@@ -224,6 +224,48 @@ namespace eMotive.Managers.Objects
             return success;
         }
 
+        public bool StandDownExaminers()
+        {
+      /*    var signups = FetchAll();
+
+            if (signups.HasContent())
+            {
+                var filtered = signups.Where(n => n.Group.EnableEmails);
+
+                if (filtered.HasContent())
+                {
+                    foreach (var signup in filtered)
+                    {
+                        foreach (var slot in signup.Slots)
+                        {
+                            var replacements = new Dictionary<string, string>(4)
+                            {
+                                {"#forename#", user.Forename},
+                                {"#surname#", user.Surname},
+                                {"#SignupDate#", signup.Date.ToString("dddd d MMMM yyyy")},
+                                {"#SlotDescription#", slot.Description},
+                                {"#SignupDescription#", signup.Description},
+                                {"#GroupDescription#", signup.Group.Name},
+                                {"#username#", user.Username},
+                                {"#sitename#", configurationService.SiteName()},
+                                {"#siteurl#", configurationService.SiteURL()}
+                            };
+
+                            if (emailService.SendMail("StandDownExaminers" user.Email, replacements))
+                            {
+                                emailService.SendEmailLog(key, user.Username);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            
+                
+            }*/
+
+            return false;
+        }
+
         public IEnumerable<Signup> FetchAllTraining()
         {
             var cacheId = "ModelSignupCollectionTraining";

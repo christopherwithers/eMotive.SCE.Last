@@ -335,6 +335,8 @@ namespace eMotive.SCE.Areas.Admin.Controllers
             ViewBag.TrustsDropDown = formManager.FetchFormList("Trusts").Collection.ToDictionary(k => k.Value, v => v.Text);
             ViewBag.GroupDropDown = allGroups;
 
+            sce.Notes = userManager.FetchUserNotes(username);
+
             sce.AllGroups = allGroups;
             ViewBag.LoggedInUser = userManager.Fetch(User.Identity.Name);
 
@@ -349,6 +351,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
             {
                 if (userManager.UpdateSCE(sce))
                 {
+                    userManager.SaveUserNotes(sce.Username, sce.Notes);
                     var successView = new SuccessView
                     {
                         Message = "The User was successfully updated.",

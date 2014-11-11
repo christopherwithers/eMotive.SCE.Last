@@ -35,6 +35,7 @@
                 </button>
             </div>
             <a href="@Url.Action("Index")" class="btn btn-inverse">Clear <i class="icon-remove icon-white"></i></a>
+            
         }
     </div>
 </div>
@@ -56,12 +57,16 @@ else
 
             @foreach (var email in Model.Emails)
             {
-                <tr>
+                <tr @if(email.Custom) { <text>class="info"</text>}>
                     <td>@email.Key</td>
                     <td>@email.Title</td>
                     <td>@email.Description</td>
-                    <td><a href="@Url.Action("Edit", new {key = email.Key})" class="btn btn-default">Edit</a></td>
-
+                    <td><a href="@Url.Action("Edit", new {key = email.Key})" class="btn btn-default">Edit</a>
+                    @if (email.Custom)
+                    {
+                        <a href="@Url.Action("SendCustom", new {key = email.Key})" class="btn btn-primary">Send</a>
+                    }
+                    </td>
                 </tr>
             }
 

@@ -265,7 +265,7 @@ namespace eMotive.Services.Objects
             using (var connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
-                var sql = "SELECT `ID`,`key`, `title`, `message`, `description` FROM `emails`;";
+                var sql = "SELECT `ID`,`key`, `title`, `message`, `description`, `Custom` FROM `emails`;";
                 var emails = connection.Query<EditableEmail>(sql);
 
                 return Mapper.Map<IEnumerable<EditableEmail>, IEnumerable<Models.Objects.Email.Email>>(emails);
@@ -303,7 +303,7 @@ namespace eMotive.Services.Objects
                 using (var connection = new MySqlConnection(connectionString))
                 {
                     connection.Open();
-                    const string sql = "SELECT `ID`,`key`, `title`, `message`, `description` FROM `emails` WHERE `ID` IN @ids;";
+                    const string sql = "SELECT `ID`,`key`, `title`, `message`, `description`, `Custom` FROM `emails` WHERE `ID` IN @ids;";
                     var emails = connection.Query<EditableEmail>(sql, new {ids = _searchResult.Items.Select(n => n.ID)});
 
                     return Mapper.Map<IEnumerable<EditableEmail>, IEnumerable<Models.Objects.Email.Email>>(emails);
@@ -403,7 +403,7 @@ namespace eMotive.Services.Objects
             using (var connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
-                const string sql = "SELECT `ID`,`key`, `title`, `message`, `description` FROM `emails` WHERE `key`=@key;";
+                const string sql = "SELECT `ID`,`key`, `title`, `message`, `description`, `Custom` FROM `emails` WHERE `key`=@key;";
                 return connection.Query<EditableEmail>(sql, new { key = _key }).SingleOrDefault();
             }
         }
@@ -413,7 +413,7 @@ namespace eMotive.Services.Objects
             using (var connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
-                const string sql = "SELECT b.`ID`, b.`key`, b.`title`, b.`message`, b.`description` FROM `emailevents` a INNER JOIN `emails` b ON a.`idEmail` = b.`id` WHERE a.`id`=@_id;";
+                const string sql = "SELECT b.`ID`, b.`key`, b.`title`, b.`message`, b.`description`, b.`Custom` FROM `emailevents` a INNER JOIN `emails` b ON a.`idEmail` = b.`id` WHERE a.`id`=@_id;";
                 return connection.Query<EditableEmail>(sql, new { id = _id });
             }
         }
@@ -423,7 +423,7 @@ namespace eMotive.Services.Objects
             using (var connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
-                const string sql = "SELECT `ID`,`key`, `title`, `message`, `description` FROM `emails` WHERE `key`=@key;";
+                const string sql = "SELECT `ID`,`key`, `title`, `message`, `description`, `Custom` FROM `emails` WHERE `key`=@key;";
                 var email = connection.Query<EditableEmail>(sql, new { key = _key }).SingleOrDefault();
 
                 if (email == null)

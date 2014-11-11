@@ -15,6 +15,8 @@ namespace eMotive.Managers.Interfaces
 
         bool Save(mod.Signup signup);
 
+        bool StandDownExaminers();
+
         IEnumerable<Signup> FetchAllTraining();
 
         IEnumerable<SessionDay> FetchAllBrief();
