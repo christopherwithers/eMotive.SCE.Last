@@ -163,6 +163,9 @@ namespace eMotive.SCE.Controllers
                         return RedirectToAction("Index", "Applicant", new { area = "" });
                     }
 
+                    HttpContext.Session.Add("FileManager92ij098sduoisjd90", true);
+                    
+
                     return RedirectToAction("Index", "Home", new { area = "Admin" });
                 }
 

@@ -16,8 +16,8 @@ namespace eMotive.Managers.Objects
     {
 
         //todo: before htting this, we need to know if the user has signed up ANYWHERE - another query? ########################
-        public SCESessionManager(ISessionRepository _signupRepository, IUserManager _userManager, ISearchManager _searchManager)
-            : base(_signupRepository, _userManager, _searchManager)
+        public SCESessionManager(ISessionRepository _signupRepository, IUserManager _userManager, ISearchManager _searchManager, IFormManager _formManager)
+            : base(_signupRepository, _userManager, _searchManager, _formManager)
         {
         }
 

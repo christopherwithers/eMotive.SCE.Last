@@ -9,6 +9,7 @@ namespace eMotive.SCE
         {
            // routes.IgnoreRoute("api/{*pathInfo}");
             routes.IgnoreRoute("api/{*pathInfo}");
+            routes.IgnoreRoute("Fileman/{*pathInfo}");
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
             routes.IgnoreRoute("{*favicon}", new { favicon = @"(.*/)?favicon.ico(/.*)?" });
          //   routes.IgnoreRoute("elmah.axd");

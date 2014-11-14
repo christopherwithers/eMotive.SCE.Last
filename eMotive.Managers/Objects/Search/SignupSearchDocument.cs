@@ -62,6 +62,12 @@ namespace eMotive.Managers.Objects.Search
             field = new Field("Group", Signup.Group.Name, Field.Store.NO, Field.Index.ANALYZED);
             doc.Add(field);
 
+            field = new Field("SiteID", Signup.Location.ID.ToString(CultureInfo.InvariantCulture), Field.Store.NO, Field.Index.ANALYZED);
+            doc.Add(field);
+
+            field = new Field("Site", Signup.Location.Name, Field.Store.NO, Field.Index.ANALYZED);
+            doc.Add(field);
+
             field = new Field("Closed", Signup.Closed.ToString(), Field.Store.NO, Field.Index.ANALYZED);
             doc.Add(field);
 

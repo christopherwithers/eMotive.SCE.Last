@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using AutoMapper;
 using Cache.Interfaces;
@@ -28,12 +29,14 @@ namespace eMotive.Managers.Objects
         private readonly ISessionRepository signupRepository;
         private readonly IUserManager userManager;
         private readonly ISearchManager searchManager;
+        private readonly IFormManager formManager;
 
-        public SessionManager(ISessionRepository _signupRepository, IUserManager _userManager, ISearchManager _searchManager)
+        public SessionManager(ISessionRepository _signupRepository, IUserManager _userManager, ISearchManager _searchManager, IFormManager _formManager)
         {
             signupRepository = _signupRepository;
             userManager = _userManager;
             searchManager = _searchManager;
+            formManager = _formManager;
 
             AutoMapperManagerConfiguration.Configure();
         }
@@ -83,8 +86,12 @@ namespace eMotive.Managers.Objects
 
             signup = Mapper.Map<rep.Signup, Signup>(repSignup);
 
+            var locationDict = formManager.FetchFormList("Sites")
+                .Collection.ToDictionary(k => k.Value, v => new Location {ID = v.Value, Name = v.Text});
+
             IDictionary<int, User> usersDict = null;
 
+            signup.Location = locationDict[repSignup.idSite.ToString(CultureInfo.InvariantCulture)];
             if (repSignup.Slots.Any(n => n.UsersSignedUp.HasContent()))
             {
                 //  usersDict = new Dictionary<int, User>();
@@ -187,10 +194,15 @@ namespace eMotive.Managers.Objects
 
             var usersDict = userManager.Fetch(signups.SelectMany(u => u.Slots.Where(n => n.UsersSignedUp.HasContent()).SelectMany(n => n.UsersSignedUp).Select(m => m.IdUser))).ToDictionary(k => k.ID, v => v);
 
+            var locationDict = formManager.FetchFormList("Sites")
+                .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
+
             foreach (var repSignup in signups)
             {
                 foreach (var modSignup in signupModels)
                 {
+                    if (repSignup.id == modSignup.ID)
+                        modSignup.Location = locationDict[repSignup.idSite.ToString(CultureInfo.InvariantCulture)];
                     foreach (var repSlot in repSignup.Slots)
                     {
                         foreach (var slot in modSignup.Slots)
@@ -216,7 +228,9 @@ namespace eMotive.Managers.Objects
 
         public bool Save(Models.Objects.SignupsMod.Signup signup)
         {
-            var success = signupRepository.Save(Mapper.Map<Models.Objects.SignupsMod.Signup, rep.Signup>(signup));
+            var repSignup = Mapper.Map<Models.Objects.SignupsMod.Signup, rep.Signup>(signup);
+            //repSignup.idSite = signup.
+            var success = signupRepository.Save(repSignup);
 
             if (!success)
                 notificationService.AddIssue("The session changes could not be saved.");
@@ -284,10 +298,16 @@ namespace eMotive.Managers.Objects
 
             var usersDict = userManager.Fetch(signups.SelectMany(u => u.Slots.Where(n => n.UsersSignedUp.HasContent()).SelectMany(n => n.UsersSignedUp).Select(m => m.IdUser))).ToDictionary(k => k.ID, v => v);
 
+            var locationDict = formManager.FetchFormList("Sites")
+                .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
             foreach (var repSignup in signups)
             {
                 foreach (var modSignup in signupModels)
                 {
+
+                    if (repSignup.id == modSignup.ID)
+                        modSignup.Location = locationDict[repSignup.idSite.ToString(CultureInfo.InvariantCulture)];
+
                     foreach (var repSlot in repSignup.Slots)
                     {
                         foreach (var slot in modSignup.Slots)
@@ -363,6 +383,8 @@ namespace eMotive.Managers.Objects
                 User = user
             };
 
+            var locationDict = formManager.FetchFormList("Sites")
+                .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
             foreach (var signup in signups)
             {
                 if (!signup.Slots.HasContent())
@@ -383,6 +405,7 @@ namespace eMotive.Managers.Objects
                             SignUpDetails = slot.Description,
                             SignedUpSlotID = slot.id,
                             SignupID = signup.id,
+                            Location = locationDict[signup.idSite.ToString(CultureInfo.InvariantCulture)],
                             SignupGroup = new Group { Description = signup.Group.Description, AllowMultipleSignups = signup.Group.AllowMultipleSignups, ID = signup.Group.ID, Name = signup.Group.Name },
                             SignupDescription = signup.Description,
                             Type = GenerateHomeViewSlotStatus(slot, user.ID)// slot.UsersSignedUp.Where(n => n.IdUser == user.ID).Single(t => t.Type)
@@ -420,6 +443,8 @@ namespace eMotive.Managers.Objects
             int signupId = 0;
             if (signups.HasContent())
             {
+                var locationDict = formManager.FetchFormList("Sites")
+                    .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
                 //signupCollection
                 foreach (var item in signups)
                 {
@@ -448,7 +473,8 @@ namespace eMotive.Managers.Objects
                             Closed = item.Closed || item.CloseDate < DateTime.Now,
                             Description = item.Description,
                             //       SignupType = item.
-                            Group = new Group { AllowMultipleSignups = item.Group.AllowMultipleSignups, Description = item.Group.Description, ID = item.Group.ID, Name = item.Group.Name }
+                            Group = new Group { AllowMultipleSignups = item.Group.AllowMultipleSignups, Description = item.Group.Description, ID = item.Group.ID, Name = item.Group.Name },
+                            Location = locationDict[item.idSite.ToString(CultureInfo.InvariantCulture)]
                         };
 
 
@@ -623,6 +649,8 @@ namespace eMotive.Managers.Objects
 
             if (signups.HasContent())
             {
+                var locationDict = formManager.FetchFormList("Sites")
+                    .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
                 //signupCollection
                 foreach (var item in signups)
                 {
@@ -648,7 +676,8 @@ namespace eMotive.Managers.Objects
                             DisabilitySignup = item.Group.DisabilitySignups,
                             Closed = item.Closed || item.CloseDate < DateTime.Now,
                             Description = item.Description,
-                            Group = new Group { AllowMultipleSignups = item.Group.AllowMultipleSignups, Description = item.Group.Description, ID = item.Group.ID, Name = item.Group.Name }
+                            Group = new Group { AllowMultipleSignups = item.Group.AllowMultipleSignups, Description = item.Group.Description, ID = item.Group.ID, Name = item.Group.Name },
+                            Location = locationDict[item.idSite.ToString(CultureInfo.InvariantCulture)]
                         };
 
                         if (signup.SignedUp)
@@ -693,6 +722,8 @@ namespace eMotive.Managers.Objects
 
             if (signups.HasContent())
             {
+                var locationDict = formManager.FetchFormList("Sites")
+                    .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
                 //signupCollection
                 foreach (var item in signups)
                 {
@@ -716,7 +747,8 @@ namespace eMotive.Managers.Objects
                             MergeReserve = item.MergeReserve,
                             OverrideClose = item.OverrideClose,
                             DisabilitySignup = item.Group.DisabilitySignups,
-                            Closed = item.Closed || item.CloseDate < DateTime.Now
+                            Closed = item.Closed || item.CloseDate < DateTime.Now,
+                            Location = locationDict[item.idSite.ToString(CultureInfo.InvariantCulture)]
                         };
 
                         if (signup.SignedUp)
@@ -1212,19 +1244,29 @@ namespace eMotive.Managers.Objects
         #region TESTING STRAIGHT SIGNUP PULLTHROUGH
         public IEnumerable<Models.Objects.SignupsMod.Signup> FetchAllM()
         {
-            var signups = Mapper.Map<IEnumerable<rep.Signup>, IEnumerable<Models.Objects.SignupsMod.Signup>>(signupRepository.FetchAll());
+            var repSignups = signupRepository.FetchAll();
+            var signups = Mapper.Map<IEnumerable<rep.Signup>, IEnumerable<Models.Objects.SignupsMod.Signup>>(repSignups);
 
             var users = userManager.Fetch(signups.SelectMany(n => n.Slots).SelectMany(m => m.UsersSignedUp).Select(o => o.IdUser)).ToDictionary(k => k.ID, v => v);
-
-            foreach (var signup in signups)
+            var locationDict = formManager.FetchFormList("Sites")
+    .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
+            foreach (var repSignup in repSignups)
             {
-                foreach (var slot in signup.Slots)
+
+
+                foreach (var signup in signups)
                 {
-                    slot.MergeReserve = signup.MergeReserve;
-                    foreach (var user in slot.UsersSignedUp)
+                    if (repSignup.id == signup.Id)
+                        signup.Location = locationDict[repSignup.idSite.ToString(CultureInfo.InvariantCulture)];
+
+                    foreach (var slot in signup.Slots)
                     {
-                        user.User = users[user.IdUser];
-                        // break;
+                        slot.MergeReserve = signup.MergeReserve;
+                        foreach (var user in slot.UsersSignedUp)
+                        {
+                            user.User = users[user.IdUser];
+                            // break;
+                        }
                     }
                 }
             }
@@ -1253,19 +1295,30 @@ namespace eMotive.Managers.Objects
 
         public IEnumerable<Models.Objects.SignupsMod.Signup> FetchM(IEnumerable<int> _ids)
         {
-            var signups = Mapper.Map<IEnumerable<rep.Signup>, IEnumerable<Models.Objects.SignupsMod.Signup>>(signupRepository.FetchSignups(_ids));
+            var repSignups = signupRepository.FetchSignups(_ids);
+            var signups = Mapper.Map<IEnumerable<rep.Signup>, IEnumerable<Models.Objects.SignupsMod.Signup>>(repSignups);
 
             var users = userManager.Fetch(signups.SelectMany(n => n.Slots).SelectMany(m => m.UsersSignedUp).Select(o => o.IdUser)).ToDictionary(k => k.ID, v => v);
+            var locationDict = formManager.FetchFormList("Sites")
+    .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
 
-            foreach (var signup in signups)
+            foreach (var repSignup in repSignups)
             {
-                foreach (var slot in signup.Slots)
+
+
+                foreach (var signup in signups)
                 {
-                    slot.MergeReserve = signup.MergeReserve;
-                    foreach (var user in slot.UsersSignedUp)
+                    if (repSignup.id == signup.Id)
+                        signup.Location = locationDict[repSignup.idSite.ToString(CultureInfo.InvariantCulture)];
+
+                    foreach (var slot in signup.Slots)
                     {
-                        user.User = users[user.IdUser];
-                        // break;
+                        slot.MergeReserve = signup.MergeReserve;
+                        foreach (var user in slot.UsersSignedUp)
+                        {
+                            user.User = users[user.IdUser];
+                            // break;
+                        }
                     }
                 }
             }

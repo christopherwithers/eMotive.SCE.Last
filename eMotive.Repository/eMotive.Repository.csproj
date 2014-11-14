@@ -72,6 +72,7 @@
     <Compile Include="Objects\Pages\Page.cs" />
     <Compile Include="Objects\Pages\PartialPage.cs" />
     <Compile Include="Objects\Signups\Group.cs" />
+    <Compile Include="Objects\Signups\Location.cs" />
     <Compile Include="Objects\Signups\SessionAttendance.cs" />
     <Compile Include="Objects\Signups\Signup.cs" />
     <Compile Include="Objects\Signups\Slot.cs" />

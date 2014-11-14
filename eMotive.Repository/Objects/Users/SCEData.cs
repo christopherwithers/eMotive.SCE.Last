@@ -1,4 +1,6 @@
-﻿namespace eMotive.Repository.Objects.Users
+﻿using System;
+
+namespace eMotive.Repository.Objects.Users
 {
     public class SCEData
     {
@@ -27,5 +29,6 @@
         public string Notes { get; set; }
         public bool Trained { get; set; }
         public bool Enabled { get; set; }
+        DateTime DateTrained { get; set; }
     }
 }

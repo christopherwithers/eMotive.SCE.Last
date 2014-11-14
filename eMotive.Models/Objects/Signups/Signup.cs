@@ -9,6 +9,7 @@ namespace eMotive.Models.Objects.Signups
         public DateTime Date { get; set; }
         public DateTime CloseDate { get; set; }
         public Group Group { get; set; }
+        public Location Location { get; set; }
         public string AcademicYear { get; set; }
         public bool Closed { get; set; }
         public bool OverrideClose { get; set; }

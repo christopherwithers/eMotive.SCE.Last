@@ -25,10 +25,11 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         private readonly ISessionManager signupManager;
         private readonly IUserManager userManager;
         private readonly INotificationService notificationService;
+        private readonly IFormManager formManager;
 
         private readonly string CONTENT_TYPE;
 
-        public ReportsController(IReportService _reportService, IDocumentManagerService _documentManager, ISessionManager _signupManager, IGroupManager _groupManager, IUserManager _userManager, INotificationService _notificationService)
+        public ReportsController(IReportService _reportService, IDocumentManagerService _documentManager, ISessionManager _signupManager, IGroupManager _groupManager, IUserManager _userManager, INotificationService _notificationService, IFormManager _formManager)
         {
             reportService = _reportService;
             documentManager = _documentManager;
@@ -36,6 +37,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
             userManager = _userManager;
             notificationService = _notificationService;
             groupManager = _groupManager;
+            formManager = _formManager;
 
             CONTENT_TYPE = documentManager.FetchMimeTypeForExtension("xlxs").Type;
         }
@@ -46,6 +48,10 @@ namespace eMotive.SCE.Areas.Admin.Controllers
             {
                 Signups = signupManager.FetchAllM()
             };
+
+           // var sites = formManager.FetchFormList("Sites");
+
+           // ViewBag.Sites = sites;
 
             return View(signupAdminView);
         }

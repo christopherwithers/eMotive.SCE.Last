@@ -262,6 +262,381 @@ namespace eMotive.SCE.Areas.Admin.Controllers
             return View(sce);
         }
 
+
+        [HttpGet]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult CreateSCE()
+        {
+            var allGroups = groupManager.FetchGroups();
+            var dropDowns = new SCEFormData();
+            ViewBag.GradesDropDown = dropDowns.Grades;
+            ViewBag.TrustsDropDown = dropDowns.Trusts;
+            ViewBag.GroupDropDown = allGroups;
+
+            var sce = new SCEData { AllGroups = allGroups, Enabled = true };
+
+            return View(sce);
+        }
+
+        [HttpPost]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult CreateSCE(SCEData sce)
+        {
+            if (ModelState.IsValid)
+            {
+                int id;
+
+                if (userManager.CreateSCE(sce, out id))
+                {
+                    var successView = new SuccessView
+                    {
+                        Message = "The new SCE was successfully created.",
+                        Links = new[]
+                            {
+                                new SuccessView.Link {Text = string.Format("Edit {0}", sce.Username), URL = @Url.Action("EditSCE", "Users", new {username = sce.Username})},
+                                new SuccessView.Link {Text = "Return to Users Home", URL = @Url.Action("Index", "Users")}
+                            }
+                    };
+
+                    TempData["SuccessView"] = successView;
+
+                    return RedirectToAction("Success", "Home", new { area = "Admin" });
+                }
+
+                var errors = NotificationService.FetchIssues();
+                if (errors.HasContent())
+                {
+                    foreach (var error in errors)
+                    {
+                        ModelState.AddModelError("error", error);
+                    }
+                }
+            }
+            var allGroups = groupManager.FetchGroups();
+            var dropDowns = new SCEFormData();
+            ViewBag.GradesDropDown = dropDowns.Grades;
+            ViewBag.TrustsDropDown = dropDowns.Trusts;
+            ViewBag.GroupDropDown = allGroups;
+            sce.AllGroups = allGroups;
+
+            return View(sce);
+        }
+
+        [HttpGet]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult EditSCE(string username)
+        {
+            var user = userManager.Fetch(username);
+            var userGroups = userManager.FetchProfile(username);
+            var allGroups = groupManager.FetchGroups();
+            var dropDowns = new SCEFormData();
+            ViewBag.GradesDropDown = dropDowns.Grades;
+            ViewBag.TrustsDropDown = dropDowns.Trusts;
+            ViewBag.GroupDropDown = allGroups;
+            var sce = userManager.FetchSCEData(user.ID);
+            sce.AllGroups = allGroups;
+            sce.Forename = user.Forename;
+            sce.Surname = user.Surname;
+            sce.Email = user.Email;
+            sce.Enabled = user.Enabled;
+            sce.BelongsToGroups = userGroups.Groups.Select(n => n.ID.ToString(CultureInfo.InvariantCulture)).ToArray();
+            sce.Notes = userManager.FetchUserNotes(username);
+            return View(sce);
+        }
+
+        [HttpPost]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult EditSCE(SCEData sce)
+        {
+            if (ModelState.IsValid)
+            {
+                int id;
+
+                if (userManager.UpdateSCE(sce))
+                {
+                    userManager.SaveUserNotes(sce.Username, sce.Notes);
+
+                    var user = userManager.Fetch(sce.Username);
+                    user.Forename = sce.Forename;
+                    user.Surname = sce.Surname;
+                    user.Email = sce.Email;
+                    user.Enabled = sce.Enabled;
+
+                    userManager.Update(user);
+
+                    var successView = new SuccessView
+                    {
+                        Message = "The SCE was successfully updated.",
+                        Links = new[]
+                            {
+                                new SuccessView.Link {Text = string.Format("Edit {0}", sce.Username), URL = @Url.Action("EditSCE", "Users", new {username = sce.Username})},
+                                new SuccessView.Link {Text = "Return to Users Home", URL = @Url.Action("Index", "Users")}
+                            }
+                    };
+
+                    TempData["SuccessView"] = successView;
+
+                    return RedirectToAction("Success", "Home", new { area = "Admin" });
+                }
+
+                var errors = NotificationService.FetchIssues();
+                if (errors.HasContent())
+                {
+                    foreach (var error in errors)
+                    {
+                        ModelState.AddModelError("error", error);
+                    }
+                }
+            }
+            var allGroups = groupManager.FetchGroups();
+            var dropDowns = new SCEFormData();
+            ViewBag.GradesDropDown = dropDowns.Grades;
+            ViewBag.TrustsDropDown = dropDowns.Trusts;
+            ViewBag.GroupDropDown = allGroups;
+            sce.AllGroups = allGroups;
+
+            return View(sce);
+        }
+
+
+        [HttpGet]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult CreateAdmin()
+        {
+            var user = new UserWithRoles
+                {SelectedRole = "null"};
+            return View(user);
+        }
+
+        [HttpPost]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult CreateAdmin(UserWithRoles user)
+        {
+            var roles = roleManager.FetchAll();
+            if (ModelState.IsValid)
+            {
+                var role = roles.Single(n => n.Name.ToLower() == "admin");
+                user.Roles = new[] { role };
+
+                int id;
+
+                if (userManager.Create(user, out id))
+                {
+                    var successView = new SuccessView
+                    {
+                        Message = "The new User was successfully created.",
+                        Links = new[]
+                            {
+                                new SuccessView.Link {Text = string.Format("Edit {0}", user.Username), URL = @Url.Action("Edit", "Users", new {username = user.Username})},
+                                new SuccessView.Link {Text = "Return to Users Home", URL = @Url.Action("Index", "Users")}
+                            }
+                    };
+
+                    TempData["SuccessView"] = successView;
+
+                    return RedirectToAction("Success", "Home", new { area = "Admin" });
+                }
+
+                var errors = NotificationService.FetchIssues();
+                if (errors.HasContent())
+                {
+                    foreach (var error in errors)
+                    {
+                        ModelState.AddModelError("error", error);
+                    }
+                }
+            }
+
+            ViewBag.Roles = new SelectList(roles, "Id", "Name");
+            return View(user);
+        }
+
+        [HttpGet]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult EditAdmin(string username)
+        {
+            var user = userManager.Fetch(username);
+
+            var userWithRoles = new UserWithRoles
+            {
+                Username = user.Username,
+                Archived = user.Archived,
+                Email = user.Email,
+                Enabled = user.Enabled,
+                Forename = user.Forename,
+                Surname = user.Surname,
+                ID = user.ID,
+                Roles = user.Roles,
+                SelectedRole = user.Roles.HasContent() ? user.Roles.FirstOrDefault().ID.ToString(CultureInfo.InvariantCulture) : "0"
+            };
+
+            ViewBag.Roles = new SelectList(roleManager.FetchAll(), "Id", "Name");//userWithRoles.AllRoles.Select(m => new SelectListItem {Text = m.Name, Value = m.ID.ToString()});
+
+            return View(userWithRoles);
+        }
+
+        [HttpPost]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult EditAdmin(UserWithRoles user)
+        {
+            var roles = roleManager.FetchAll(); user.SelectedRole = "admin";
+
+            if (ModelState.IsValid)
+            {
+                var role = roles.Single(n => n.Name.ToLower() == "admin");
+                user.Roles = new[] { role };
+
+
+                if (userManager.Update(user))
+                {
+                    var successView = new SuccessView
+                    {
+                        Message = "The Admin was successfully updated.",
+                        Links = new[]
+                            {
+                                new SuccessView.Link {Text = string.Format("Edit {0}", user.Username), URL = @Url.Action("EditAdmin", "Users", new {username = user.Username})},
+                                new SuccessView.Link {Text = "Return to Users Home", URL = @Url.Action("Index", "Users")}
+                            }
+                    };
+
+                    TempData["SuccessView"] = successView;
+
+                    return RedirectToAction("Success", "Home", new { area = "Admin" });
+                }
+
+                var errors = NotificationService.FetchIssues();
+                if (errors.HasContent())
+                {
+                    foreach (var error in errors)
+                    {
+                        ModelState.AddModelError("error", error);
+                    }
+                }
+            }
+
+            return View(user);
+        }
+
+        [HttpGet]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult EditUGC(string username)
+        {
+            var user = userManager.Fetch(username);
+            
+            var userWithRoles = new UserWithRoles
+            {
+                Username = user.Username,
+                Archived = user.Archived,
+                Email = user.Email,
+                Enabled = user.Enabled,
+                Forename = user.Forename,
+                Surname = user.Surname,
+                ID = user.ID,
+                Roles = user.Roles,
+                SelectedRole = user.Roles.HasContent() ? user.Roles.FirstOrDefault().ID.ToString(CultureInfo.InvariantCulture) : "0"
+            };
+
+            ViewBag.Roles = new SelectList(roleManager.FetchAll(), "Id", "Name");//userWithRoles.AllRoles.Select(m => new SelectListItem {Text = m.Name, Value = m.ID.ToString()});
+
+            return View(userWithRoles);
+        }
+
+        [HttpPost]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult EditUGC(UserWithRoles user)
+        {
+            var roles = roleManager.FetchAll(); user.SelectedRole = "ugc";
+
+            if (ModelState.IsValid)
+            {
+                var role = roles.Single(n => n.Name.ToLower() == "ugc");
+                user.Roles = new[] { role };
+
+                if (userManager.Update(user))
+                {
+                    var successView = new SuccessView
+                    {
+                        Message = "The UGC was successfully updated.",
+                        Links = new[]
+                            {
+                                new SuccessView.Link {Text = string.Format("Edit {0}", user.Username), URL = @Url.Action("EditUGC", "Users", new {username = user.Username})},
+                                new SuccessView.Link {Text = "Return to Users Home", URL = @Url.Action("Index", "Users")}
+                            }
+                    };
+
+                    TempData["SuccessView"] = successView;
+
+                    return RedirectToAction("Success", "Home", new { area = "Admin" });
+                }
+
+                var errors = NotificationService.FetchIssues();
+                if (errors.HasContent())
+                {
+                    foreach (var error in errors)
+                    {
+                        ModelState.AddModelError("error", error);
+                    }
+                }
+            }
+
+            return View(user);
+        }
+
+
+
+        [HttpGet]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult CreateUGC()
+        {
+            var user = new UserWithRoles { SelectedRole = "null" };
+
+            return View(user);
+        }
+
+        [HttpPost]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        public ActionResult CreateUGC(UserWithRoles user)
+        {
+            var roles = roleManager.FetchAll();
+            if (ModelState.IsValid)
+            {
+                var role = roles.Single(n => n.Name.ToLower() == "ugc");
+                user.Roles = new[] { role };
+
+                int id;
+
+                if (userManager.Create(user, out id))
+                {
+                    var successView = new SuccessView
+                    {
+                        Message = "The new User was successfully created.",
+                        Links = new[]
+                            {
+                                new SuccessView.Link {Text = string.Format("Edit {0}", user.Username), URL = @Url.Action("Edit", "Users", new {username = user.Username})},
+                                new SuccessView.Link {Text = "Return to Users Home", URL = @Url.Action("Index", "Users")}
+                            }
+                    };
+
+                    TempData["SuccessView"] = successView;
+
+                    return RedirectToAction("Success", "Home", new { area = "Admin" });
+                }
+
+                var errors = NotificationService.FetchIssues();
+                if (errors.HasContent())
+                {
+                    foreach (var error in errors)
+                    {
+                        ModelState.AddModelError("error", error);
+                    }
+                }
+            }
+
+            ViewBag.Roles = new SelectList(roles, "Id", "Name");
+            return View(user);
+        }
+
+
         [HttpGet]
         [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
         public ActionResult Create()

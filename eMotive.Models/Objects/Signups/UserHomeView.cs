@@ -37,6 +37,7 @@ namespace eMotive.Models.Objects.Signups
         public Group SignupGroup { get; set; }
         public string SignupDescription { get; set; }
         public SlotType Type { get; set; }
+        public Location Location { get; set; }
 
     }
 }

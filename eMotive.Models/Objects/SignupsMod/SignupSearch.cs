@@ -18,6 +18,9 @@ namespace eMotive.Models.Objects.SignupsMod
         public Collection<KeyValuePair<string, string>> GroupFilter { get; set; }
         public string SelectedGroupFilter { get; set; }
 
+        public Collection<KeyValuePair<string, string>> LocationFilter { get; set; }
+        public string SelectedLocationFilter { get; set; }
+
        /* public IDictionary<string, List<Signup>> GetSignupsGroupedByGroup()
         {
             if (!Signups.HasContent())

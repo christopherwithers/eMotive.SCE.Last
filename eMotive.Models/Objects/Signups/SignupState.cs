@@ -24,6 +24,7 @@ namespace eMotive.Models.Objects.Signups
         public SlotType TypeAvailable { get; set; }
         public bool DisabilitySignup { get; set; }
         public bool Closed { get; set; }
+        public Location Location { get; set; }
 
         public Collection<SlotType> SignupTypes { get; set; } // public SlotType SignupType { get; set; }
 

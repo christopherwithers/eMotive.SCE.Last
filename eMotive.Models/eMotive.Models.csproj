@@ -107,6 +107,7 @@
     <Compile Include="Objects\SignupsMod\UserSlotView.cs" />
     <Compile Include="Objects\Signups\AdminSignupView.cs" />
     <Compile Include="Objects\Signups\Group.cs" />
+    <Compile Include="Objects\Signups\Location.cs" />
     <Compile Include="Objects\Signups\SCETrainingInformation.cs" />
     <Compile Include="Objects\Signups\SessionAttendance.cs" />
     <Compile Include="Objects\Signups\SessionDay.cs" />

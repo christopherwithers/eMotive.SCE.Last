@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using eMotive.Models.Objects.Signups;
 using Extensions;
 
 namespace eMotive.Models.Objects.SignupsMod
@@ -18,6 +19,8 @@ namespace eMotive.Models.Objects.SignupsMod
         public DateTime Date { get; set; }
         public DateTime CloseDate { get; set; }
         public Group Group { get; set; }
+        public Location Location { get; set; }
+        
         public string AcademicYear { get; set; }
         public bool Closed { get; set; }
         public bool OverrideClose { get; set; }

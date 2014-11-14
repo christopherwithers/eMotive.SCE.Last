@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using eMotive.Models.Objects.Signups;
 using eMotive.Models.Validation.User;
 using ServiceStack.FluentValidation.Attributes;
@@ -33,7 +34,7 @@ namespace eMotive.Models.Objects.Users
         public string Notes { get; set; }
         public bool Trained { get; set; }
         public bool Enabled { get; set; }
-
+        public DateTime DateTrained { get; set; }
         public string[] BelongsToGroups { get; set; }
 
         public IEnumerable<Group> AllGroups { get; set; }

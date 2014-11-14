@@ -55,7 +55,7 @@
 
 @if (((User)ViewBag.LoggedInUser).Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
 {
-    <div  style="margin: 10px;"><!--<a href="Url.Action("Create")" class="btn">Create User</a> --> <a href="@Url.Action("Create")" class="btn">Create Admin</a> <a href="@Url.Action("CreateInterviewer")" class="btn">Create SCE</a> <a href="@Url.Action("Create")" class="btn">Create UCG</a> </div>
+    <div  style="margin: 10px;"><!--<a href="Url.Action("Create")" class="btn">Create User</a> --> <a href="@Url.Action("CreateAdmin")" class="btn">Create Admin</a> <a href="@Url.Action("CreateSCE")" class="btn">Create SCE</a> <a href="@Url.Action("CreateUGC")" class="btn">Create UGC</a> </div>
 }
 @if (!Model.Users.HasContent())
 {
@@ -105,9 +105,21 @@ else
                                 {
                                     if (user.Roles.Any(n => n.Name == "SCE"))
                                     {
-                                        <li><a href="@Url.Action("EditUser", new {username = user.Username})">Edit User</a></li>
+                                        <li><a href="@Url.Action("EditSCE", new {username = user.Username})">Edit User</a></li>
                                     }
-                                    else
+                                    else if (user.Roles.Any(n => n.Name == "UGC"))
+                                    {
+                                        <li><a href="@Url.Action("EditUGC", new {username = user.Username})">Edit User</a></li>
+                                    }
+                                    else if (user.Roles.Any(n => n.Name == "Admin"))
+                                    {
+                                        <li><a href="@Url.Action("EditAdmin", new {username = user.Username})">Edit User</a></li>
+                                    }
+                                }
+                                
+                                @if (((User)ViewBag.LoggedInUser).Roles.Any(n =>  n.Name == "Super Admin"))
+                                {
+                                    if (user.Roles.Any(n => n.Name == "Super Admin"))
                                     {
                                         <li><a href="@Url.Action("Edit", new {username = user.Username})">Edit User</a></li>
                                     }

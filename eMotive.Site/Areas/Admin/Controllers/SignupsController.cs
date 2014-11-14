@@ -34,15 +34,17 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         private readonly IGroupManager groupManager;
         private readonly IDocumentManagerService documentManager;
         private readonly IUserManager userManager;
+        private readonly IFormManager formManager;
 
         private readonly Dictionary<string, string> searchFilter;
 
-        public SignupsController(ISessionManager _signupManager, IGroupManager _groupManager, IDocumentManagerService _documentManager, IUserManager _userManager)
+        public SignupsController(ISessionManager _signupManager, IGroupManager _groupManager, IDocumentManagerService _documentManager, IUserManager _userManager, IFormManager _formManager)
         {
             signupManager = _signupManager;
             groupManager = _groupManager;
             documentManager = _documentManager;
             userManager = _userManager;
+            formManager = _formManager;
 
             searchFilter = new Dictionary<string, string> { { "Type", "Signup" } };
         }
@@ -63,6 +65,9 @@ namespace eMotive.SCE.Areas.Admin.Controllers
 
             if (!string.IsNullOrEmpty(signupSearch.SelectedGroupFilter) && signupSearch.SelectedGroupFilter != "0")
                 searchFilter.Add("GroupID", signupSearch.SelectedGroupFilter);
+
+            if (!string.IsNullOrEmpty(signupSearch.SelectedLocationFilter) && signupSearch.SelectedLocationFilter != "0")
+                searchFilter.Add("SiteID", signupSearch.SelectedLocationFilter);
 
             signupSearch.Filter = searchFilter;
         //    signupSearch.PageSize = 20;
@@ -88,6 +93,16 @@ namespace eMotive.SCE.Areas.Admin.Controllers
 
                 groupFilter.AddRange(groups.Select(n => new KeyValuePair<string, string>(n.ID.ToString(CultureInfo.InvariantCulture), n.Name)));
                 signupSearch.GroupFilter = groupFilter;
+            }
+
+            var sites = formManager.FetchFormList("Sites");
+
+            if (sites != null && sites.Collection.HasContent())
+            {
+                var siteFilter = new Collection<KeyValuePair<string, string>> { new KeyValuePair<string, string>("0", string.Empty) };
+
+                siteFilter.AddRange(sites.Collection.Select(n => new KeyValuePair<string, string>(n.Value, n.Text)));
+                signupSearch.LocationFilter = siteFilter;
             }
 
             return View(signupSearch);

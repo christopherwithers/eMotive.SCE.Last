@@ -17,5 +17,16 @@ namespace eMotive.Models.Objects.Signups
 
             return dict;
         }
+
+
+        public IDictionary<string, List<SignupsMod.Signup>> GetSignupsGroupedByLocation()
+        {
+            if (!Signups.HasContent())
+                return null;
+
+            var dict = Signups.GroupBy(m => m.Location.Name).ToDictionary(k => k.Key, v => v.ToList());
+
+            return dict;
+        }
     }
 }
