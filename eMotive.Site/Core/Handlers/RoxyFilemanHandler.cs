@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Security.Policy;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.SessionState;
@@ -19,12 +20,16 @@ namespace eMotive.SCE.Core.Handlers
         Dictionary<string, string> _lang;
         HttpResponse _r;
         HttpContext _context;
-        private const string ConfFile = "../Fileman/conf.json";
+        private string ConfFile;// = "/Fileman/conf.json";
 
         public void ProcessRequest(HttpContext context)
         {
             _context = context;
             _r = context.Response;
+            
+            ConfFile = string.Format("{0}/Fileman/conf.json", VirtualPathUtility.ToAbsolute("~/"));
+
+
             var action = "DIRLIST";
             try
             {
@@ -116,7 +121,7 @@ namespace eMotive.SCE.Core.Handlers
 
         private static string GetLangFile()
         {
-            return "../Fileman/lang/en.json";
+            return "/Fileman/lang/en.json";
         }
 
         private string LangRes(string name)
@@ -168,6 +173,8 @@ namespace eMotive.SCE.Core.Handlers
 
         private Dictionary<string, string> ParseJSON(string file)
         {
+
+
             var ret = new Dictionary<string, string>();
             var json = string.Empty;
             try
@@ -206,7 +213,7 @@ namespace eMotive.SCE.Core.Handlers
             if (GetSetting("SESSION_PATH_KEY") != "" && _context.Session[GetSetting("SESSION_PATH_KEY")] != null)
                 ret = (string)_context.Session[GetSetting("SESSION_PATH_KEY")];
 
-            ret = string.IsNullOrEmpty(ret) ? _context.Server.MapPath("../Uploads") : FixPath(ret);
+            ret = string.IsNullOrEmpty(ret) ? _context.Server.MapPath("/Uploads") : FixPath(ret);
 
             return ret;
         }
@@ -240,7 +247,7 @@ namespace eMotive.SCE.Core.Handlers
                 setting = setting.Substring(0, setting.IndexOf("?", StringComparison.Ordinal));
             if (!setting.StartsWith("/"))
                 setting = "/" + setting;
-            setting = ".." + setting;
+            //setting = ".." + setting;
 
             if (_context.Server.MapPath(setting) != _context.Server.MapPath(_context.Request.Url.LocalPath))
                 throw new Exception(LangRes("E_ActionDisabled"));
@@ -286,12 +293,12 @@ namespace eMotive.SCE.Core.Handlers
 
             if (!dir.Exists)
                 throw new Exception(LangRes("E_CopyDirInvalidPath"));
-           
+
             if (newDir.Exists)
                 throw new Exception(LangRes("E_DirAlreadyExists"));
-            
+
             _copyDir(dir.FullName, newDir.FullName);
-            
+
             _r.Write(GetSuccessRes());
         }
 
@@ -336,7 +343,7 @@ namespace eMotive.SCE.Core.Handlers
 
             if (!Directory.Exists(path))
                 throw new Exception(LangRes("E_CreateDirInvalidPath"));
-            
+
             try
             {
                 path = Path.Combine(path, name);
@@ -382,7 +389,7 @@ namespace eMotive.SCE.Core.Handlers
             path = FixPath(path);
             if (!File.Exists(path))
                 throw new Exception(LangRes("E_DeleteFileInvalidPath"));
-            
+
             try
             {
                 File.Delete(path);
@@ -436,7 +443,7 @@ namespace eMotive.SCE.Core.Handlers
             for (var i = 0; i < dirs.Count; i++)
             {
                 var dir = (string)dirs[i];
-                _r.Write("{\"p\":\"/" + dir.Replace(localPath, "").Replace("\\", "/") + "\",\"f\":\"" + GetFiles(dir, type).Count.ToString() + "\",\"d\":\"" + Directory.GetDirectories(dir).Length.ToString(CultureInfo.InvariantCulture) + "\"}");
+                _r.Write("{\"p\":\"/" + dir.Replace(localPath, "").Replace("\\", "/") + "\",\"f\":\"" + GetFiles(dir, type).Count + "\",\"d\":\"" + Directory.GetDirectories(dir).Length.ToString(CultureInfo.InvariantCulture) + "\"}");
                 if (i < dirs.Count - 1)
                     _r.Write(",");
             }
@@ -499,7 +506,7 @@ namespace eMotive.SCE.Core.Handlers
             var tmpZip = _context.Server.MapPath("../tmp/" + dirName + ".zip");
             if (File.Exists(tmpZip))
                 File.Delete(tmpZip);
-           
+
             ZipFile.CreateFromDirectory(path, tmpZip, CompressionLevel.Fastest, true);
             _r.Clear();
             _r.Headers.Add("Content-Disposition", "attachment; filename=\"" + dirName + ".zip\"");
@@ -539,16 +546,16 @@ namespace eMotive.SCE.Core.Handlers
                 throw new Exception(LangRes("E_DirAlreadyExists"));
 
 
-                try
-                {
-                    source.MoveTo(dest.FullName);
-                    _r.Write(GetSuccessRes());
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(LangRes("E_MoveDir") + " \"" + path + "\"");
-                }
-            
+            try
+            {
+                source.MoveTo(dest.FullName);
+                _r.Write(GetSuccessRes());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(LangRes("E_MoveDir") + " \"" + path + "\"");
+            }
+
 
         }
         private void MoveFile(string path, string newPath)
@@ -563,16 +570,16 @@ namespace eMotive.SCE.Core.Handlers
             if (dest.Exists)
                 throw new Exception(LangRes("E_MoveFileAlreadyExists"));
 
-                try
-                {
-                    source.MoveTo(dest.FullName);
-                    _r.Write(GetSuccessRes());
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(LangRes("E_MoveFile") + " \"" + path + "\"");
-                }
-            
+            try
+            {
+                source.MoveTo(dest.FullName);
+                _r.Write(GetSuccessRes());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(LangRes("E_MoveFile") + " \"" + path + "\"");
+            }
+
         }
 
         private void RenameDir(string path, string name)
@@ -582,23 +589,23 @@ namespace eMotive.SCE.Core.Handlers
             var dest = new DirectoryInfo(Path.Combine(source.Parent.FullName, name));
             if (source.FullName == GetFilesRoot())
                 throw new Exception(LangRes("E_CannotRenameRoot"));
-            
+
             if (!source.Exists)
                 throw new Exception(LangRes("E_RenameDirInvalidPath"));
-            
+
             if (dest.Exists)
                 throw new Exception(LangRes("E_DirAlreadyExists"));
 
-                try
-                {
-                    source.MoveTo(dest.FullName);
-                    _r.Write(GetSuccessRes());
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(LangRes("E_RenameDir") + " \"" + path + "\"");
-               }
-            
+            try
+            {
+                source.MoveTo(dest.FullName);
+                _r.Write(GetSuccessRes());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(LangRes("E_RenameDir") + " \"" + path + "\"");
+            }
+
         }
 
         private void RenameFile(string path, string name)
@@ -612,16 +619,16 @@ namespace eMotive.SCE.Core.Handlers
             if (!CanHandleFile(name))
                 throw new Exception(LangRes("E_FileExtensionForbidden"));
 
-                try
-                {
-                    source.MoveTo(dest.FullName);
-                    _r.Write(GetSuccessRes());
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception(ex.Message + "; " + LangRes("E_RenameFile") + " \"" + path + "\"");
-                }
-            
+            try
+            {
+                source.MoveTo(dest.FullName);
+                _r.Write(GetSuccessRes());
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message + "; " + LangRes("E_RenameFile") + " \"" + path + "\"");
+            }
+
         }
 
         private static bool ThumbnailCallback()
@@ -682,7 +689,7 @@ namespace eMotive.SCE.Core.Handlers
             cropImg.Dispose();
         }
 
-        private ImageFormat GetImageFormat(string filename)
+        private static ImageFormat GetImageFormat(string filename)
         {
             var ret = ImageFormat.Jpeg;
             switch (new FileInfo(filename).Extension.ToLower())

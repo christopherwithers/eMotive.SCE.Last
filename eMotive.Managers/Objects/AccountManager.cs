@@ -121,7 +121,7 @@ namespace eMotive.Managers.Objects
                         {"#accounttype#", _user.Roles.HasContent() ? _user.Roles.First().Name : string.Empty},
                     };
 
-                var profile = userRepository.FetchProfile(_user.Username);
+         //       var profile = userRepository.FetchProfile(_user.Username);
 
 
                 var key = string.Empty;
@@ -129,18 +129,11 @@ namespace eMotive.Managers.Objects
                 if (_user.Roles.Any(n => n.Name == "Admin"))
                     key = "CreateAdminAccount";
 
-                if (_user.Roles.Any(n => n.Name == "Interviewer"))
-                {
-                    if (profile.Groups.Any(n => n.Name == "Observer"))
-                        key = "CreateObserverAccount";
-                    else
-                        key = "CreateInterviewerAccount";
-                }
+                if (_user.Roles.Any(n => n.Name == "UGC"))
+                    key = "CreateUGCAccount";
 
-                if (_user.Roles.Any(n => n.Name == "Applicant"))
-                    key = "CreateApplicantAccount";
-
-
+                if (_user.Roles.Any(n => n.Name == "SCE"))
+                    key = "CreateSCEAccount";
 
                 if (emailService.SendMail(key, _user.Email, replacements))
                 {
@@ -187,16 +180,12 @@ namespace eMotive.Managers.Objects
                 if (user.Roles.Any(n => n.Name == "Admin"))
                     key = "CreateAdminAccount";
 
-                if (user.Roles.Any(n => n.Name == "Interviewer"))
-                {
-                    if (profile.Groups.Any(n => n.Name == "Observer"))
-                        key = "CreateObserverAccount";
-                    else
-                        key = "CreateInterviewerAccount";
-                }
+                if (user.Roles.Any(n => n.Name == "UGC"))
+                    key = "CreateUGCAccount";
 
-                if (user.Roles.Any(n => n.Name == "Applicant"))
-                    key = "CreateApplicantAccount";
+                if (user.Roles.Any(n => n.Name == "SCE"))
+                    key = "CreateSCEAccount";
+
 
                 
 

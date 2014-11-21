@@ -6,9 +6,9 @@
             plugins: [
                 "advlist autolink lists link image charmap print preview anchor",
                 "searchreplace visualblocks code fullscreen",
-                "insertdatetime media table contextmenu paste"
+                "insertdatetime media table contextmenu paste spellchecker"
             ],
-            toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+            toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | spellchecker",
             menubar: false,
             mode: "specific_textareas",
             editor_selector: "tinymce",
@@ -23,8 +23,30 @@
                 editor.on('SaveContent', function(e) {
                     e.content = e.content.replace(/&#39/g, '&apos');
                 });
+            }, file_browser_callback: RoxyFileBrowser,
+            spellchecker_rpc_url: siteRoot + "api/Dictionary/Spelling",
+            document_base_url: rootURL
+
+
+        }); function RoxyFileBrowser(field_name, url, type, win) {
+            var roxyFileman = '/fileman/index.html';
+            if (roxyFileman.indexOf("?") < 0) {
+                roxyFileman += "?type=" + type;
             }
-
-
-        });
+            else {
+                roxyFileman += "&type=" + type;
+            }
+            roxyFileman += '&input=' + field_name + '&value=' + document.getElementById(field_name).value;
+            tinyMCE.activeEditor.windowManager.open({
+                file: roxyFileman,
+                title: 'Roxy Fileman',
+                width: 850,
+                height: 650,
+                resizable: "yes",
+                plugins: "media",
+                inline: "yes",
+                close_previous: "no"
+            }, { window: win, input: field_name });
+            return false;
+        };
     </script>

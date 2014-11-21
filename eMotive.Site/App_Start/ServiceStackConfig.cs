@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using eMotive.SCE.Controllers;
 using eMotive.IoCBindings.Funq;
 using eMotive.Models.Validation.Account;
+using eMotive.Services.Interfaces;
+using eMotive.Services.Objects;
 using FluentValidation.Mvc;
 using Funq;
 using ServiceStack.CacheAccess;
@@ -25,7 +28,7 @@ namespace eMotive.SCE
 {
     public class AppHost : AppHostBase
     {
-        public AppHost() : base("MMI Web Services", typeof(Api.SessionService).Assembly) { }
+        public AppHost() : base("SCE Web Services", typeof(Api.SessionService).Assembly) { }
 
         public override void Configure(Container container)
         {
@@ -36,6 +39,10 @@ namespace eMotive.SCE
                 FlushOnDispose = false
             });
             container.Register<ISessionFactory>(c => new SessionFactory(c.Resolve<ICacheClient>()));
+
+            var dictDir = @"\Core\SpellChecker\";
+            container.Register<IDictionaryService>(c => new DictionaryService(HttpContext.Current.Server.MapPath(string.Format("~{0}", dictDir)))).ReusedWithin(ReuseScope.Container);
+            
 
           //  SetConfig(new EndpointHostConfig { DebugMode = true });
             JsConfig.DateHandler = JsonDateHandler.ISO8601;

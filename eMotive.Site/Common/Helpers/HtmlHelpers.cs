@@ -24,7 +24,7 @@ namespace eMotive.SCE.Common.Helpers
             switch (_slotStatus)
             {
                 case SlotStatus.AlreadySignedUp:
-                    name = "Cancel My Appointment";
+                    name = "Cancel My Session";
                     break;
                 case SlotStatus.Clash:
                     name = "Unavailable";

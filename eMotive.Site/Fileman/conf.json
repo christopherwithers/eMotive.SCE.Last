@@ -7,7 +7,7 @@
 "PREVIEW_THUMB_HEIGHT":"200",
 "MAX_IMAGE_WIDTH":     "0",
 "MAX_IMAGE_HEIGHT":    "0",
-"INTEGRATION":       "tinymce3",
+"INTEGRATION":       "tinymce4",
 "DIRLIST":           "/FileManager?a=DIRLIST",
 "CREATEDIR":         "/FileManager?a=CREATEDIR",
 "DELETEDIR":         "/FileManager?a=DELETEDIR",

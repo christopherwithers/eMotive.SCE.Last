@@ -2,7 +2,7 @@
 @model ChangePassword 
 @{
     ViewBag.Title = "MyDetails";
-    Layout = User.IsInRole("Interviewer") || User.IsInRole("Applicant") ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_LayoutAdmin.cshtml";
+    Layout = User.IsInRole("SCE") ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_LayoutAdmin.cshtml";
 }
 <div class="page-header">
      <h2>Details</h2>

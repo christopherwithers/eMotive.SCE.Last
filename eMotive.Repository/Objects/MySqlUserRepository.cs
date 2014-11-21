@@ -432,7 +432,7 @@ namespace eMotive.Repository.Objects
             {
              //   connection.Open();
 
-                var sql = "SELECT `id`, `idUser`, `ExaminationNumber`, `Title`, `SecretaryEmail`, `OtherEmail` AS 'EmailOther', `MainSpecialty`, `Trust`, `Grade`, `Address1`, `Address2`, `City`, `Region`, `Postcode`, `PhoneWork`, `PhoneMobile`, `PhoneOther`, `Trained`, `GMCNumber`  FROM `scereference` WHERE `idUser`=@id;";
+                var sql = "SELECT `id`, `idUser`, `ExaminationNumber`, `Title`, `SecretaryEmail`, `OtherEmail` AS 'EmailOther', `MainSpecialty`, `Trust`, `Grade`, `Address1`, `Address2`, `City`, `Region`, `Postcode`, `PhoneWork`, `PhoneMobile`, `PhoneOther`, `Trained`, `GMCNumber`, `DateTrained`  FROM `scereference` WHERE `idUser`=@id;";
 
                 var sceData = connection.Query<SCEData>(sql, new { id = _id }).SingleOrDefault();
 
@@ -445,7 +445,7 @@ namespace eMotive.Repository.Objects
             using (var connection = new MySqlConnection(connectionString))
             {
                     connection.Open();
-                    var sql = "INSERT INTO `scereference` (`idUser`, `ExaminationNumber`, `Title`, `SecretaryEmail`, `OtherEmail`, `MainSpecialty`, `Trust`, `Grade`, `Address1`, `Address2`, `City`, `Region`, `PostCode`, `PhoneWork`, `PhoneMobile`, `PhoneOther`, `Trained`,`GMCNumber`) VALUES (@idUser, @ExaminationNumber, @Title, @SecretaryEmail, @OtherEmail, @MainSpecialty, @Trust, @Grade, @Address1, @Address2, @City, @Region, @PostCode, @PhoneWork, @PhoneMobile, @PhoneOther, @Trained, @GMCNumber);";
+                    var sql = "INSERT INTO `scereference` (`idUser`, `ExaminationNumber`, `Title`, `SecretaryEmail`, `OtherEmail`, `MainSpecialty`, `Trust`, `Grade`, `Address1`, `Address2`, `City`, `Region`, `PostCode`, `PhoneWork`, `PhoneMobile`, `PhoneOther`, `Trained`,`GMCNumber`, `DateTrained`) VALUES (@idUser, @ExaminationNumber, @Title, @SecretaryEmail, @OtherEmail, @MainSpecialty, @Trust, @Grade, @Address1, @Address2, @City, @Region, @PostCode, @PhoneWork, @PhoneMobile, @PhoneOther, @Trained, @GMCNumber, @DateTrained);";
 
                     var success = connection.Execute(sql, new
                     {
@@ -466,7 +466,8 @@ namespace eMotive.Repository.Objects
                         PhoneWork = _sce.PhoneWork,
                         PhoneMobile = _sce.PhoneMobile,
                         PhoneOther = _sce.PhoneOther,
-                        Trained = _sce.Trained
+                        Trained = _sce.Trained,
+                        DateTrained = _sce.DateTrained
                     }) > 0;
 
                     return success;
@@ -479,7 +480,7 @@ namespace eMotive.Repository.Objects
             using (var connection = new MySqlConnection(connectionString))
             {
                 connection.Open();
-                var sql = "Update `scereference` SET `ExaminationNumber` = @ExaminationNumber, `Title` = @Title, `SecretaryEmail` = @SecretaryEmail, `OtherEmail` = @OtherEmail, `MainSpecialty` =@MainSpecialty, `Trust` = @Trust, `Grade` = @Grade, `Address1` = @Address1, `Address2` = @Address2, `City` = @City, `Region` = @Region, `PostCode` = @PostCode, `PhoneWork` = @PhoneWork, `PhoneMobile` = @PhoneMobile, `PhoneOther` = @PhoneOther, `Trained` = @Trained,`GMCNumber` = @GMCNumber WHERE `id`=@id ;";
+                var sql = "Update `scereference` SET `ExaminationNumber` = @ExaminationNumber, `Title` = @Title, `SecretaryEmail` = @SecretaryEmail, `OtherEmail` = @OtherEmail, `MainSpecialty` =@MainSpecialty, `Trust` = @Trust, `Grade` = @Grade, `Address1` = @Address1, `Address2` = @Address2, `City` = @City, `Region` = @Region, `PostCode` = @PostCode, `PhoneWork` = @PhoneWork, `PhoneMobile` = @PhoneMobile, `PhoneOther` = @PhoneOther, `Trained` = @Trained,`GMCNumber` = @GMCNumber, `DateTrained`=@DateTrained WHERE `id`=@id ;";
 
                 var success = connection.Execute(sql, new
                 {
@@ -500,7 +501,8 @@ namespace eMotive.Repository.Objects
                     PhoneWork = _sce.PhoneWork,
                     PhoneMobile = _sce.PhoneMobile,
                     PhoneOther = _sce.PhoneOther,
-                    Trained = _sce.Trained
+                    Trained = _sce.Trained,
+                    DateTrained = _sce.DateTrained
                 }) > 0;
 
                 return success;

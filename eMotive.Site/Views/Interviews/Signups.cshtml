@@ -1,4 +1,6 @@
-﻿@using Extensions
+﻿@using System.Linq
+@using eMotive.Models.Objects
+@using Extensions
 @using eMotive.SCE.Common.Helpers
 @using eMotive.Models.Objects.Signups
 
@@ -99,7 +101,7 @@ else
                                     @if (signup.SignedUp)
                                     {
                                         <span class="label label-success">Signed Up</span>
-                                        foreach (var type in signup.SignupTypes)
+                                        foreach (var type in signup.SignupTypes.Where(n => n == SlotType.Interested))
                                         {
                                              <span class="label label-success">@type</span>
                                         }
@@ -112,7 +114,7 @@ else
                                 </td>
                                 <td>@signup.Date.ToString("dddd d MMMM yyyy")</td>
              
-
+                                <tr><td>@signup.Location.Name</td></tr>
                                 <td id="signup_value_@signup.ID">@signup.SlotsAvailableString()</td>
                                 <td>
                                     <form action="@Url.Action("Slots", "Interviews", new {area = "", id = signup.ID})">
@@ -127,7 +129,7 @@ else
             </div>
         }
     </div>
-    @Html.Raw(Server.HtmlDecode((Model.FooterText)))
+    @Html.Raw(Server.HtmlDecode(Model.FooterText))
 }
 
 @section footer

@@ -29,6 +29,6 @@ namespace eMotive.Repository.Objects.Users
         public string Notes { get; set; }
         public bool Trained { get; set; }
         public bool Enabled { get; set; }
-        DateTime DateTrained { get; set; }
+        public DateTime DateTrained { get; set; }
     }
 }

@@ -14,7 +14,7 @@ namespace eMotive.Models.Objects.Signups
             PageSections = new Dictionary<string, PartialPage>();
             SignupDetails = new Collection<UserSignupDetails>();
 
-            ButtonText = "You have not signed up for any sessions. Click here to do so.";
+            ButtonText = "You have not yet signed up for any sessions. Click here to do so.";
         }
 
         public User User { get; set; }

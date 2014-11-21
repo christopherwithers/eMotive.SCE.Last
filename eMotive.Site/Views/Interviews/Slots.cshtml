@@ -18,11 +18,15 @@
             @if (slot.IsSignedUpToSlot())
             {
                 <span class="label label-success">Signed Up</span>
-                <span class="label label-success">@slot.SignupType</span>
+                if (slot.SignupType == SlotType.Interested)
+                {
+                    <span class="label label-success">@slot.SignupType</span>
+                }
             }
             else
             {
-                @Html.Raw("&nbsp;");
+                @Html.Raw("&nbsp;")
+                ;
             }
         </td>
         <td>@slot.Description</td>
@@ -36,7 +40,7 @@
     </tbody>
 </table>
 
-@Html.ActionLink("Back To Interview Dates", "SignUps", null, new {@class = "btn btn-info btn-small"})
+@Html.ActionLink("Back To Session Dates", "SignUps", null, new {@class = "btn btn-info btn-small"})
 
 
 @if (Model.HasSignedUp)
@@ -44,7 +48,7 @@
     <div id="ClashModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-            <h3 id="myModalLabel">You have already signed up for an interview slot</h3>
+            <h3 id="myModalLabel">You have already signed up for a session</h3>
         </div>
         <div class="modal-body">
 

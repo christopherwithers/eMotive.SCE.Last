@@ -47,12 +47,12 @@ namespace eMotive.SCE.Controllers
             if (user == null)
                 user = userManager.Fetch(User.Identity.Name);
 
-            if (user.Roles.Any(n => n.Name == "Interviewer"))
-            {
-                return BuildInterviewerMenu();
-            }
+           // if (user.Roles.Any(n => n.Name == "SCE"))
+          //  {
+          //      return BuildSCEMenu();
+           // }
             //applicant menu
-            return BuildApplicantMenu(config.AllowWithdrawals());
+            return BuildSCEMenu(config.AllowWithdrawals());
         }
 
         private Menu BuildLoggedOutMenu()
@@ -133,23 +133,19 @@ namespace eMotive.SCE.Controllers
             return menu;
         }
 
-        private Menu BuildApplicantMenu(bool allowWithdrawal)
+        private Menu BuildSCEMenu(bool allowWithdrawal)
         {
-            Menu menu = null;
-
-            if (allowWithdrawal)
-            {
-                menu = new Menu
+            var menu = new Menu
                 {
                     ID = 1,
-                    Title = "ApplicantMenu",
+                    Title = "SCEMenu",
                     MenuItems = new[]
                     {
                         new MenuItem
                         {
                             ID = 1,
                             Name = string.Format("{0} Home", config.SiteName()),
-                            URL = Url.Action("Index", "Applicant"), //"/SCE/Home/",
+                            URL = Url.Action("Index", "Home"), //"/SCE/Home/",
                             Title = string.Format("{0} Home", config.SiteName()),
                         },
                         new MenuItem
@@ -159,13 +155,13 @@ namespace eMotive.SCE.Controllers
                             URL = Url.Action("Signups", "Interviews"), //"/SCE/Interviews/Signups",
                             Title = "View Session Slots"
                         },
-                        /*new MenuItem
+                        new MenuItem
                                     {
                                         ID = 2,
                                         Name = "My Details",
                                         URL = Url.Action("InterviewerDetails","Account"),//"/SCE/Account/Details",
                                         Title = "My Details"
-                                    },*/
+                                    },
                         new MenuItem
                         {
                             ID = 2,
@@ -176,15 +172,8 @@ namespace eMotive.SCE.Controllers
                         new MenuItem
                         {
                             ID = 2,
-                            Name = "Withdraw",
-                            URL = Url.Action("Withdraw", "Account"), //"/SCE/Account/Details",
-                            Title = "Withdraw from application process"
-                        },
-                        new MenuItem
-                        {
-                            ID = 2,
                             Name = "Contact Us",
-                            URL = Url.Action("ContactUs", "Applicant"), //"/SCE/Home/ContactUs",
+                            URL = Url.Action("ContactUs", "Home"), //"/SCE/Home/ContactUs",
                             Title = "Our Contact Details"
                         },
                         new MenuItem
@@ -197,62 +186,7 @@ namespace eMotive.SCE.Controllers
 
                     }
                 };
-            }
-            else
-            {
-                menu = new Menu
-                {
-                    ID = 1,
-                    Title = "ApplicantMenu",
-                    MenuItems = new[]
-                            {
-                                 new MenuItem
-                                    {
-                                        ID = 1,
-                                        Name = string.Format("{0} Home", config.SiteName()),
-                                        URL = Url.Action("Index","Applicant"),//"/SCE/Home/",
-                                        Title = string.Format("{0} Home", config.SiteName()),
-                                    },
-                                 new MenuItem
-                                    {
-                                        ID = 2,
-                                        Name = "Sessions",
-                                        URL = Url.Action("Signups","Interviews"),//"/SCE/Interviews/Signups",
-                                        Title = "View Session Slots"
-                                    },
-                                    /*new MenuItem
-                                    {
-                                        ID = 2,
-                                        Name = "My Details",
-                                        URL = Url.Action("InterviewerDetails","Account"),//"/SCE/Account/Details",
-                                        Title = "My Details"
-                                    },*/
-                                 new MenuItem
-                                    {
-                                        ID = 2,
-                                        Name = "Change Password",
-                                        URL = Url.Action("Details","Account"),//"/SCE/Account/Details",
-                                        Title = "Change Password"
-                                    },
-                                 new MenuItem
-                                    {
-                                        ID = 2,
-                                        Name = "Contact Us",
-                                        URL = Url.Action("ContactUs","Applicant"),//"/SCE/Home/ContactUs",
-                                        Title = "Our Contact Details"
-                                    },
-                                 new MenuItem
-                                    {
-                                        ID = 2,
-                                        Name = "Logout",
-                                        URL = Url.Action("Logout","Account"),//"/SCE/Account/Logout",
-                                        Title = "Logout"
-                                    }
-
-                            }
-                };
-            }
-
+            
             return menu;
         }
 

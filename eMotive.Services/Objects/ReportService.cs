@@ -62,6 +62,8 @@ namespace eMotive.Services.Objects
             }
         }
 
+
+
         public IEnumerable<InterviewerReportItem> FetchInterviewersNotSignedUp()
         {
             using (var connection = new MySqlConnection(connectionString))
@@ -69,7 +71,7 @@ namespace eMotive.Services.Objects
                 connection.Open();
                 //const string sql = "SELECT a.* FROM `users` a INNER JOIN `userhasroles` b ON a.`ID` = b.`UserId` WHERE b.RoleID=4 AND `ID` NOT IN (SELECT `IdUser` FROM `userhasslots`);";
                 const string sql =
-                    "SELECT users.*, interviewerReference.* FROM `Users` users INNER JOIN `UserhasRoles` userHasRoles ON users.id=userHasRoles.UserID INNER JOIN `Roles` roles ON userHasRoles.`RoleId` = roles.`ID` INNER JOIN `scereference` interviewerreference ON users.`ID`=interviewerReference.`idUser` INNER JOIN `userhasgroups` userHasGroups ON users.`ID`= userHasGroups.`IdUser` INNER JOIN `Groups` groups ON userHasGroups.`IdGroup` = groups.`ID` WHERE roles.`Name`='Interviewer' AND (groups.Name='Interviewer' AND groups.Name!='Observer') AND users.ID NOT IN (SELECT idUser FROM `UserHasSlots`);";
+                    "SELECT users.*, interviewerReference.* FROM `Users` users INNER JOIN `UserhasRoles` userHasRoles ON users.id=userHasRoles.UserID INNER JOIN `Roles` roles ON userHasRoles.`RoleId` = roles.`ID` INNER JOIN `scereference` interviewerreference ON users.`ID`=interviewerReference.`idUser` WHERE roles.`Name`='SCE' AND users.ID NOT IN (SELECT idUser FROM `UserHasSlots`);";
                 
                 return connection.Query<InterviewerReportItem>(sql);
             }

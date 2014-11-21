@@ -125,7 +125,7 @@ else
                                     }
                                 }
                                 <li><a href="#" onclick="UserActions.FetchEmailLog('@user.Username','@user.Forename','@user.Surname')">View Emails Sent</a></li>
-                                <li><a href="#" onclick="UserActions.FetchSessionLog('@user.Username','@user.Forename','@user.Surname')">View Interview Sessions</a></li>
+                                <li><a href="#" onclick="UserActions.FetchSessionLog('@user.Username','@user.Forename','@user.Surname')">View Sessions</a></li>
                                 <li><a href="#" onclick="UserActions.ResendAccountCreationEmail('@user.Username')">Resend Account Information Email</a></li>
                                 @if (((User) ViewBag.LoggedInUser).Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
                                 {
@@ -225,7 +225,7 @@ else
                 <strong>Error!</strong> <span id="NotesErrorMessage">An error occured!</span>
             </div>
 
-            <textarea id="NotesText" class="tinymce" cols="20" data-val="true" name="Text" rows="2" style="width: 98.5%; height: 15em;"></textarea>
+            <textarea id="NotesText" cols="20" data-val="true" name="Text" rows="2" style="width: 98.5%; height: 15em;"></textarea>
         </div>
     <div class="modal-footer">
         <button type="button" class="btn" data-dismiss="modal">Close</button>
@@ -241,3 +241,4 @@ else
 
 
 }
+@Html.Partial("_tinymceEditor")

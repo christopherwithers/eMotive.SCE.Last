@@ -107,11 +107,18 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                                 {
                                     ID = 1,
                                     Name = "Pages",
-                                    URL = Url.Action("Index", "Pages", new {area="Admin"}),//"/MMIAdmin/Admin/Pages/",
+                                    URL = "#",//"/MMIAdmin/Admin/Pages/",
                                     Title = "Page Administration",
                                     Icon = "<span class='icon-book'></span>",
                                     MenuItems = new []
-                                        {
+                                        {                                            new MenuItem
+                                            {
+                                                ID = 1,
+                                                Name = "Pages",
+                                                URL = Url.Action("Index", "Pages", new {area="Admin"}),//"/MMIAdmin/Admin/Users",
+                                                Title = "Page Administration",
+                                                Icon = "<span class='icon-book'></span>",
+                                            },
                                             new MenuItem
                                             {
                                                 ID = 1,
@@ -156,33 +163,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                                                 Icon = "<span class='icon-repeat'></span>",
 
                                             },*/
-                                            new MenuItem
-                                            {
-                                                ID = 1,
-                                                Name = "BOXI Report Upload",
-                                                URL = Url.Action("BoxiUpload", "Signups", new {area="Admin"}),//"/MMIAdmin/Admin/Roles",
-                                                Title = "BOXI Report Upload",
-                                                Icon = "<span class='icon-upload'></span>",
 
-                                            },
-                                            new MenuItem
-                                            {
-                                                ID = 1,
-                                                Name = "A100 Applicant Upload",
-                                                URL = Url.Action("A100ApplicantUpload", "Signups", new {area="Admin"}),//"/MMIAdmin/Admin/Roles",
-                                                Title = "A100 Applicant Spreadsheet Upload",
-                                                Icon = "<span class='icon-upload'></span>",
-
-                                            },
-                                            new MenuItem
-                                            {
-                                                ID = 1,
-                                                Name = "A101 Applicant Upload",
-                                                URL = Url.Action("A101ApplicantUpload", "Signups", new {area="Admin"}),//"/MMIAdmin/Admin/Roles",
-                                                Title = "A101 Applicant Spreadsheet Upload",
-                                                Icon = "<span class='icon-upload'></span>",
-
-                                            }
                                         }
                                 },
                                 new MenuItem
@@ -268,11 +249,18 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                                 {
                                     ID = 1,
                                     Name = "Pages",
-                                    URL = Url.Action("Index", "Pages", new {area="Admin"}),//"Admin/Pages/",
+                                    URL = "#",//"/MMIAdmin/Admin/Pages/",
                                     Title = "Page Administration",
                                     Icon = "<span class='icon-book'></span>",
                                     MenuItems = new []
-                                        {
+                                        {                                            new MenuItem
+                                            {
+                                                ID = 1,
+                                                Name = "Pages",
+                                                URL = Url.Action("Index", "Pages", new {area="Admin"}),//"/MMIAdmin/Admin/Users",
+                                                Title = "Page Administration",
+                                                Icon = "<span class='icon-book'></span>",
+                                            },
                                             new MenuItem
                                             {
                                                 ID = 1,
@@ -307,33 +295,6 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                                                 URL = Url.Action("Groups", "Signups", new {area="Admin"}),//"/MMIAdmin/Admin/Pages/",
                                                 Title = "Group Administration",
                                                 Icon = "<span class='icon-ok-circle'></span>",
-                                            },
-                                            new MenuItem
-                                            {
-                                                ID = 1,
-                                                Name = "BOXI Report Upload",
-                                                URL = Url.Action("BoxiUpload", "Signups", new {area="Admin"}),//"/MMIAdmin/Admin/Roles",
-                                                Title = "BOXI Report Upload",
-                                                Icon = "<span class='icon-upload'></span>",
-
-                                            },
-                                            new MenuItem
-                                            {
-                                                ID = 1,
-                                                Name = "A100 Applicant Upload",
-                                                URL = Url.Action("A100ApplicantUpload", "Signups", new {area="Admin"}),//"/MMIAdmin/Admin/Roles",
-                                                Title = "A100 Applicant Spreadsheet Upload",
-                                                Icon = "<span class='icon-upload'></span>",
-
-                                            },
-                                            new MenuItem
-                                            {
-                                                ID = 1,
-                                                Name = "A101 Applicant Upload",
-                                                URL = Url.Action("A101ApplicantUpload", "Signups", new {area="Admin"}),//"/MMIAdmin/Admin/Roles",
-                                                Title = "A101 Applicant Spreadsheet Upload",
-                                                Icon = "<span class='icon-upload'></span>",
-
                                             }
                                         }
                                 },

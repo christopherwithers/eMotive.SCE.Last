@@ -483,15 +483,9 @@ namespace eMotive.Repository.Objects
             {
                 connection.Open();
 
-                const string query = "UPDATE `groups` SET `Name`=@name, `AllowMultipleSignups`=@allowMultipleSignups, `Description`=@description, `EnableEmails` WHERE `Id`=@id;";
+                const string query = "UPDATE `groups` SET `Name`=@name, `AllowMultipleSignups`=@allowMultipleSignups, `Description`=@description, `EnableEmails`=@enableEmails WHERE `Id`=@id;";
 
-                return connection.Execute(query, new
-                {
-                    name = _group.Name,
-                    allowMultipleSignups = _group.AllowMultipleSignups,
-                    description = _group.Description,
-                    id = _group.ID
-                }) > 0;
+                return connection.Execute(query, _group) > 0;
             }
         }
 

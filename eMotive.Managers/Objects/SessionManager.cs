@@ -940,8 +940,8 @@ namespace eMotive.Managers.Objects
                     if (signup.Group.EnableEmails)
                     {
                         //+1 to account for the signup we are currently processing
-                        var reserveSignup = slot.ApplicantsSignedUp.HasContent() &&
-                                            slot.ApplicantsSignedUp.Count() + 1 > slot.TotalPlacesAvailable;
+                        var SCEInterestedSignup = slot.ApplicantsSignedUp.HasContent() &&
+                                            slot.ApplicantsSignedUp.Count() + slot.ReservePlaces + 1 > slot.TotalPlacesAvailable;
                         // slot.ApplicantsSignedUp.Single(n => n.ID == 0).ID = id;
                         var replacements = new Dictionary<string, string>(4)
                         {
@@ -961,10 +961,10 @@ namespace eMotive.Managers.Objects
 
                         var key = string.Empty;
 
-                        if (user.Roles.Any(n => n.Name == "Applicant"))
-                            key = "ApplicantSessionSignup";
+                        if (user.Roles.Any(n => n.Name == "SCE"))
+                            key = "SCESessionSignup";
 
-                        if (user.Roles.Any(n => n.Name == "Interviewer"))
+                     /*   if (user.Roles.Any(n => n.Name == "Interviewer"))
                         {
                             if (signup.Group.Name == "Observer")
                             {
@@ -975,6 +975,10 @@ namespace eMotive.Managers.Objects
 
                                 key = reserveSignup ? "ReserveSessionSignup" : "InterviewerSessionSignup";
                             }
+                        }*/
+                        if (SCEInterestedSignup)
+                        {
+                            key = "SCEInterestedSignup";
                         }
 
 
@@ -985,6 +989,7 @@ namespace eMotive.Managers.Objects
                         }
                         return true;
                     }
+                    return true;
                 }
 
                 notificationService.AddError("An error occured. ");
@@ -1057,17 +1062,17 @@ namespace eMotive.Managers.Objects
 
                         var key = string.Empty;
 
-                        if (user.Roles.Any(n => n.Name == "Applicant"))
-                            key = "ApplicantSessionCancel";
+                        if (user.Roles.Any(n => n.Name == "SCE"))
+                            key = "SCESessionCancel";
 
-                        if (user.Roles.Any(n => n.Name == "Interviewer"))
+                /*        if (user.Roles.Any(n => n.Name == "Interviewer"))
                         {
                             if (signup.Group.Name == "Observer")
                                 key = "ObserverSessionCancel";
                             else
                                 key = reserveCancel ? "ReserveSessionCancel" : "InterviewerSessionCancel";
                         }
-
+                        */
 
                         if (emailService.SendMail(key, user.Email, replacements))
                         {
@@ -1078,7 +1083,7 @@ namespace eMotive.Managers.Objects
                             {
                                 var users = slot.ApplicantsSignedUp.Select(n => n).OrderBy(n => n.SignupDate).ToArray();
 
-                                var UserToBump = users[slot.TotalPlacesAvailable /*+ slot.ReservePlaces*/].User;
+                                var UserToBump = users[slot.TotalPlacesAvailable /*+ slot.ReservePlaces*/ +1].User;
 
 
                                 key = "SlotUpgrade";

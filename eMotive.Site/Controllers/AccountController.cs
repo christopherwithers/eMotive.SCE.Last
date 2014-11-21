@@ -52,7 +52,7 @@ namespace eMotive.SCE.Controllers
             return View(new Login());
         }
 
-        [System.Web.Mvc.Authorize(Roles = "Applicant")]
+        [System.Web.Mvc.Authorize(Roles = "SCE")]
         [HttpGet]
         public ActionResult Withdraw()
         {
@@ -147,23 +147,13 @@ namespace eMotive.SCE.Controllers
                         });
 
                     }
-                    // var auth = new AuthService();
 
-                  //  auth.Authenticate(new Auth {UserName = user.Username});
-
-                   // notificationService.AddError("some error");
-                    
-                    if (user.Roles.Any(n => n.Name == "Interviewer"))
+                    if (user.Roles.Any(n => n.Name == "SCE"))
                     {
                         return RedirectToAction("Index", "Home", new { area = "" });
                     }
 
-                    if (user.Roles.Any(n => n.Name == "Applicant"))
-                    {
-                        return RedirectToAction("Index", "Applicant", new { area = "" });
-                    }
-
-                    HttpContext.Session.Add("FileManager92ij098sduoisjd90", true);
+                    HttpContext.Session.Add("FileManager92ij098sduoisjd90", "/Uploads");
                     
 
                     return RedirectToAction("Index", "Home", new { area = "Admin" });
@@ -200,7 +190,7 @@ namespace eMotive.SCE.Controllers
                         Message = "Your username has been emailed to your registered email address.",
                         Links = new[]
                             {
-                                new SuccessView.Link {Text = "Return to Login", URL = "/MMI/Account/Login"}
+                                new SuccessView.Link {Text = "Return to Login", URL = @Url.Action("Login", "Account")}
 
                             }
                     };
@@ -242,7 +232,7 @@ namespace eMotive.SCE.Controllers
                         Message = "A new password has been emailed to your registered email address.",
                         Links = new[]
                             {
-                                new SuccessView.Link {Text = "Return to Login", URL = "/MMI/Account/Login"}
+                                new SuccessView.Link {Text = "Return to Login", URL = @Url.Action("Login", "Account")}
 
                             }
                     };
@@ -361,7 +351,7 @@ namespace eMotive.SCE.Controllers
                         Message = "Your password has been updated.",
                         Links = new[]
                             {
-                                new SuccessView.Link {Text = "Return to Details page", URL = "/MMI/Account/Details"}
+                                new SuccessView.Link {Text = "Return to Details page", URL = @Url.Action("Details", "Account")}
                             }
                     };
 

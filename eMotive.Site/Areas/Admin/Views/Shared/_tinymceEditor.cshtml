@@ -1,14 +1,15 @@
 ﻿    <script src="@Url.Content("~/Content/tinymce/tinymce.min.js")"></script> 
     <script type="text/javascript">
-        
-        tinymce.init({
-            selector: "textarea",
-            plugins: [
-                "advlist autolink lists link image charmap print preview anchor",
-                "searchreplace visualblocks code fullscreen",
-                "insertdatetime media table contextmenu paste"
-            ],
-            toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+
+    tinymce.init({
+        selector: "textarea",
+        plugins: [
+            "advlist autolink lists link image charmap print preview anchor spellchecker",
+            "searchreplace visualblocks code fullscreen",
+            "insertdatetime media table contextmenu paste"
+        ],
+        content_css: ["@Url.Content("~/Content/bootstrap-responsive.min.css")", "@Url.Content("~/Content/bootstrap.min.css")", "@Url.Content("~/Content/jquery-ui.css")"],
+            toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | spellchecker",
             mode: "specific_textareas",
             editor_selector: "tinymce",
             encoding: "xml",
@@ -24,13 +25,14 @@
                 {
                     e.content = e.content.replace(/&#39/g, '&apos');
                 });
-            },file_browser_callback: RoxyFileBrowser
-
+            },file_browser_callback: RoxyFileBrowser,
+            spellchecker_rpc_url: siteRoot + "api/Dictionary/Spelling",
+            document_base_url: rootURL
 
         });
 
         function RoxyFileBrowser(field_name, url, type, win) {
-            var roxyFileman = '/fileman/index.html';
+            var roxyFileman = siteRoot + 'fileman/index.html';
             if (roxyFileman.indexOf("?") < 0) {
                 roxyFileman += "?type=" + type;
             }

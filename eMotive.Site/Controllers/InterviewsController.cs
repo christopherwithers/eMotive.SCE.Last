@@ -8,7 +8,7 @@ using ServiceStack.Mvc;
 
 namespace eMotive.SCE.Controllers
 {
-    [Common.ActionFilters.Authorize(Roles = "Interviewer,Applicant")]
+    [Common.ActionFilters.Authorize(Roles = "SCE")]
     public class InterviewsController : ServiceStackController
     {
         private readonly ISessionManager signupManager;
@@ -48,23 +48,15 @@ namespace eMotive.SCE.Controllers
         public ActionResult Signups()
         {
             var signups = signupManager.FetchSignupInformation(User.Identity.Name);
-            var user = userManager.Fetch(User.Identity.Name);
+
 
             Dictionary<string, string> pageText = null;
 
-            if (user.Roles.Any(n => n.Name == "Applicant"))
-            {
-                pageText = pageManager.FetchPartials(new[] { "Applicant-Session-List-Header", "Applicant-Session-List-Footer" }).ToDictionary(k => k.Key, v => v.Text);
-                signups.HeaderText = pageText["Applicant-Session-List-Header"];
-                signups.FooterText = pageText["Applicant-Session-List-Footer"];
-            }
-            else
-            {
-                pageText= pageManager.FetchPartials(new[] { "Session-List-header", "Session-List-Footer" }).ToDictionary(k => k.Key, v => v.Text);
-                signups.HeaderText = pageText["Session-List-header"];
-                signups.FooterText = pageText["Session-List-Footer"];
-            }
+            pageText = pageManager.FetchPartials(new[] { "SCE-Session-List-Header", "SCE-Session-List-Footer" }).ToDictionary(k => k.Key, v => v.Text);
 
+
+            signups.HeaderText = pageText["SCE-Session-List-Header"];
+            signups.FooterText = pageText["SCE-Session-List-Footer"];
 
             return View(signups);
         }
@@ -81,7 +73,7 @@ namespace eMotive.SCE.Controllers
 
             Dictionary<string, string> pageText = null;
 
-            if (user.Roles.Any(n => n.Name == "Applicant"))
+            if (user.Roles.Any(n => n.Name == "SCE"))
             {
                 pageText = pageManager.FetchPartials(new[] {"Session-List-header", "Session-List-Footer"}).ToDictionary(k => k.Key, v => v.Text);
                 signups.HeaderText = pageText["Session-List-header"];
@@ -104,18 +96,9 @@ namespace eMotive.SCE.Controllers
 
             Dictionary<string, string> pageText;
 
-            if (user.Roles.Any(n => n.Name == "Applicant"))
-            {
-                pageText = pageManager.FetchPartials(new[] { "Applicant-Interview-Date-Page", "Applicant-Interview-Date-Page-Footer" }).ToDictionary(k => k.Key, v => v.Text);
-                slots.HeaderText = pageText["Applicant-Interview-Date-Page"];
-                slots.FooterText = pageText["Applicant-Interview-Date-Page-Footer"];
-            }
-            else
-            {
-                pageText = pageManager.FetchPartials(new[] { "Interview-Date-Page", "Interview-Date-Page-Footer" }).ToDictionary(k => k.Key, v => v.Text);
-                slots.HeaderText = pageText["Interview-Date-Page"];
-                slots.FooterText = pageText["Interview-Date-Page-Footer"];
-            }
+
+                pageText = pageManager.FetchPartials(new[] { "SCE-Interview-Date-Page", "SCE-Interview-Date-Page-Footer" }).ToDictionary(k => k.Key, v => v.Text);
+
 
             if (slots != null)
             {
@@ -125,9 +108,9 @@ namespace eMotive.SCE.Controllers
                     {"#description#", slots.Description},
                     {"#group#", slots.Group.Name}
                 };
-                //Disability-Interview-Date-Page
-                var sbHead = new StringBuilder(slots.HeaderText);
-                var sbFoot = new StringBuilder(slots.FooterText);
+
+                var sbHead = new StringBuilder(pageText["SCE-Interview-Date-Page"]);
+                var sbFoot = new StringBuilder(pageText["SCE-Interview-Date-Page-Footer"]);
 
                 foreach (var replacment in replacements)
                 {
@@ -137,8 +120,7 @@ namespace eMotive.SCE.Controllers
 
                 slots.HeaderText = sbHead.ToString();
                 slots.FooterText = sbFoot.ToString();
-                /*slots.HeaderText = sb.ToString();
-                slots.FooterText = pageManager.Fetch("Interview-Date-Page-Footer").Text;*/
+
                 slots.LoggedInUser = User.Identity.Name ?? string.Empty;
             }
 

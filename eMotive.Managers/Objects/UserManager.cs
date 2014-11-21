@@ -198,7 +198,7 @@ namespace eMotive.Managers.Objects
 
         public bool CreateSCE(SCEData _sce, out int _id)
         {
-            var role = roleManager.FetchAll().SingleOrDefault( n => n.Name == "Interviewer");
+            var role = roleManager.FetchAll().SingleOrDefault( n => n.Name == "SCE");
             var tempUser = new UserWithRoles
             {
                 Username = _sce.Username,
@@ -270,7 +270,7 @@ namespace eMotive.Managers.Objects
 
         public bool UpdateSCE(SCEData _sce)
         {
-            var role = roleManager.FetchAll().SingleOrDefault(n => n.Name == "Interviewer");
+            var role = roleManager.FetchAll().SingleOrDefault(n => n.Name == "SCE");
             var tempUser = new UserWithRoles
             {
                 ID = _sce.IdUser,

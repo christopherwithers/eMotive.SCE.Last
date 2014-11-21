@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -16,7 +17,7 @@ using ServiceStack.Mvc;
 
 namespace eMotive.SCE.Areas.Admin.Controllers
 {
-    [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+    [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin, UGC")]
     public class ReportsController : ServiceStackController
     {
         private readonly IReportService reportService;
@@ -26,10 +27,11 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         private readonly IUserManager userManager;
         private readonly INotificationService notificationService;
         private readonly IFormManager formManager;
-
+        private readonly IEmailService emailService;
+        private readonly IeMotiveConfigurationService configurationService;
         private readonly string CONTENT_TYPE;
 
-        public ReportsController(IReportService _reportService, IDocumentManagerService _documentManager, ISessionManager _signupManager, IGroupManager _groupManager, IUserManager _userManager, INotificationService _notificationService, IFormManager _formManager)
+        public ReportsController(IReportService _reportService, IDocumentManagerService _documentManager, ISessionManager _signupManager, IGroupManager _groupManager, IUserManager _userManager, INotificationService _notificationService, IFormManager _formManager, IEmailService _emailService, IeMotiveConfigurationService _configurationService)
         {
             reportService = _reportService;
             documentManager = _documentManager;
@@ -38,6 +40,8 @@ namespace eMotive.SCE.Areas.Admin.Controllers
             notificationService = _notificationService;
             groupManager = _groupManager;
             formManager = _formManager;
+            emailService = _emailService;
+            configurationService = _configurationService;
 
             CONTENT_TYPE = documentManager.FetchMimeTypeForExtension("xlxs").Type;
         }
@@ -46,7 +50,8 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         {
             var signupAdminView = new AdminSignupView
             {
-                Signups = signupManager.FetchAllM()
+                Signups = signupManager.FetchAllM(),
+                LoggedInUser = userManager.Fetch(User.Identity.Name)
             };
 
            // var sites = formManager.FetchFormList("Sites");
@@ -56,21 +61,32 @@ namespace eMotive.SCE.Areas.Admin.Controllers
             return View(signupAdminView);
         }
 
-        public FileStreamResult AllInterviewers()
+        public FileStreamResult AllSCEs()
         {
-            var loggedInUser = userManager.Fetch(User.Identity.Name);
-
-            var users = reportService.FetchAllInterviewers();
+            var users = reportService.FetchAllSCEs();
 
             if (users.HasContent())
             {
                 using (var xlPackage = new ExcelPackage())
                 {
-                    const string REPORT_NAME = "All Interviewers Report";
-                    var worksheet = xlPackage.Workbook.Worksheets.Add(REPORT_NAME);
+                    const string reportName = "All SCEs Report";
+                    var worksheet = xlPackage.Workbook.Worksheets.Add(reportName);
 
-                    int x = 1;
+                    var password = Guid.NewGuid().ToString("N");
+                    xlPackage.Encryption.IsEncrypted = true;
+                    xlPackage.Encryption.Password = password;
+
+                    SendPassword(password, reportName);
+                    worksheet.Cells[1,1].Value = "This report contain personal details. Please ensure that it is kept confidential.";
                     using (var r = worksheet.Cells["A1:S1"])
+                    {
+                        r.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(122, 255, 94, 0));
+                        r.Style.Font.Bold = true;
+                        r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    }
+                    int x = 2;
+                    using (var r = worksheet.Cells["A2:S2"])
                     {
                         r.Style.Fill.PatternType = ExcelFillStyle.Solid;
                         r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(171, 205, 250));
@@ -93,10 +109,10 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                     worksheet.Cells[x, ++i].Value = "Trained";
                     worksheet.Cells[x, ++i].Value = "Enabled";
 
-                    if (loggedInUser != null && loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
-                    {
+                  //  if (loggedInUser != null && loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
+                  //  {
                         worksheet.Cells[x, ++i].Value = "Notes";
-                    }
+               //     }
 
                     x++;
 
@@ -125,15 +141,16 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                         worksheet.Cells[x, ++i].Value = user.Trained ? "Yes" : "No";
                         worksheet.Cells[x, ++i].Value = user.Enabled ? "Yes" : "No";
 
-                        if (loggedInUser != null && loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
-                        {
+                      //  if (loggedInUser != null && loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
+                      //  {
                             worksheet.Cells[x, ++i].Value = user.Notes;
-                        }
+                      //  }
 
                         x++;
                     }
-
-                    return new FileStreamResult(new MemoryStream(xlPackage.GetAsByteArray()), CONTENT_TYPE) { FileDownloadName = string.Format("{0}.xlsx", REPORT_NAME) };
+                   
+                    
+                    return new FileStreamResult(new MemoryStream(xlPackage.GetAsByteArray()), CONTENT_TYPE) { FileDownloadName = string.Format("{0}.xlsx", reportName) };
 
                 }
             }
@@ -320,7 +337,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         }
 
 
-        public FileStreamResult InterviewersNotSignedUp()
+        public FileStreamResult SCEsNotSignedUp()
         {
             var loggedInUser = userManager.Fetch(User.Identity.Name);
             var users = reportService.FetchInterviewersNotSignedUp();
@@ -330,11 +347,25 @@ namespace eMotive.SCE.Areas.Admin.Controllers
 
             using (var xlPackage = new ExcelPackage())
             {
-                const string REPORT_NAME = "Interviewers not signed up Report";
-                var worksheet = xlPackage.Workbook.Worksheets.Add(REPORT_NAME);
+                const string reportName = "SCEs not signed up Report";
+                var worksheet = xlPackage.Workbook.Worksheets.Add(reportName);
 
-                int x = 1;
+                var password = Guid.NewGuid().ToString("N");
+                xlPackage.Encryption.IsEncrypted = true;
+                xlPackage.Encryption.Password = password;
+
+                SendPassword(password, reportName);
+
+                worksheet.Cells[1, 1].Value = "This report contain personal details. Please ensure that it is kept confidential.";
                 using (var r = worksheet.Cells["A1:S1"])
+                {
+                    r.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                    r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(122, 255, 94, 0));
+                    r.Style.Font.Bold = true;
+                    r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                }
+                int x = 2;
+                using (var r = worksheet.Cells["A2:S2"])
                 {
                     r.Style.Fill.PatternType = ExcelFillStyle.Solid;
                     r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(171, 205, 250));
@@ -396,7 +427,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                     x++;
                 }
 
-                return new FileStreamResult(new MemoryStream(xlPackage.GetAsByteArray()), CONTENT_TYPE) { FileDownloadName = string.Format("{0}.xlsx", REPORT_NAME) };
+                return new FileStreamResult(new MemoryStream(xlPackage.GetAsByteArray()), CONTENT_TYPE) { FileDownloadName = string.Format("{0}.xlsx", reportName) };
 
             }
         }
@@ -654,23 +685,57 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         }
 
 
+        private void SendPassword(string password, string reportName)
+        {
+            var user = userManager.Fetch(User.Identity.Name);
+
+            var replacements = new Dictionary<string, string>(4)
+                    {
+                        {"#forename#", user.Forename},
+                        {"#surname#", user.Surname},
+                        {"#username#", user.Username},
+                        {"#reportname#", reportName},
+                        {"#reportgenerated#", DateTime.Now.ToLongDateString()},
+                        {"#password#", password},
+                        {"#sitename#", configurationService.SiteName()},
+                        {"#siteurl#", configurationService.SiteURL()},
+                    };
+
+            if (emailService.SendMail("SendReportPassword", user.Email, replacements))
+            {
+                emailService.SendEmailLog("SendReportPassword", user.Username);
+            }
+        }
+
         public FileStreamResult FullInterviewReport()
         {
             var loggedInUser = userManager.Fetch(User.Identity.Name);
             var signups = signupManager.FetchAll();
-            var sceFormData = new SCEFormData();
 
             if (signups != null)
             {
-
-
                 using (var xlPackage = new ExcelPackage())
                 {
-                    string REPORT_NAME = "Full Session Report";
-                    var worksheet = xlPackage.Workbook.Worksheets.Add(REPORT_NAME);
 
-                    int x = 1;
+
+                    const string reportName = "Full Session Report";
+                    var worksheet = xlPackage.Workbook.Worksheets.Add(reportName);
+
+                    var password = Guid.NewGuid().ToString("N");
+                    xlPackage.Encryption.IsEncrypted = true;
+                    xlPackage.Encryption.Password = password;
+
+                    SendPassword(password, reportName);
+                    worksheet.Cells[1, 1].Value = "This report contain personal details. Please ensure that it is kept confidential.";
                     using (var r = worksheet.Cells["A1:U1"])
+                    {
+                        r.Style.Fill.PatternType = ExcelFillStyle.Solid;
+                        r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(122, 255, 94, 0));
+                        r.Style.Font.Bold = true;
+                        r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    }
+                    int x = 2;
+                    using (var r = worksheet.Cells["A2:U2"])
                     {
                         r.Style.Fill.PatternType = ExcelFillStyle.Solid;
                         r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(171, 205, 250));
@@ -787,7 +852,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
 
                     return new FileStreamResult(new MemoryStream(xlPackage.GetAsByteArray()), CONTENT_TYPE)
                     {
-                        FileDownloadName = string.Format("{0}.xlsx", REPORT_NAME)
+                        FileDownloadName = string.Format("{0}.xlsx", reportName)
                     };
                 }
             }

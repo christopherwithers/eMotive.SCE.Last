@@ -1,4 +1,5 @@
-﻿@using System.Linq
+﻿@using System.Activities.Statements
+@using System.Linq
 @using Extensions
 @using eMotive.Models.Objects.Signups
 @model AdminSignupView
@@ -21,61 +22,51 @@
     <h2>Reports</h2>
 </div>
 
-<h4>General Reports</h4>
-<table class="table table-striped table-hover table-bordered">
-    <thead>
-        <tr>
-            <th>All Users</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>All Interviewers</td>
-            <td>@Html.ActionLink("Download Report", "AllInterviewers", "Reports", new { area = "admin" }, new { @class = "btn btn-default" })</td>
-        </tr>
-        <tr>
-            <td>All Observers</td>
-            <td>@Html.ActionLink("Download Report", "AllObservers", "Reports", new { area = "admin" }, new { @class = "btn btn-default" })</td>
-        </tr>
-        <tr>
-            <td>All Interviewers and Observers</td>
-            <td>@Html.ActionLink("Download Report", "AllInterviewersAndObservers", "Reports", new { area = "admin" }, new { @class = "btn btn-default" })</td>
-        </tr>
-       <!-- <tr>
-            <td>SCEs not signed up to a session</td>
-            <td>Html.ActionLink("Download Report", "NotSignedUp", "Reports", new { area = "admin" }, new { class = "btn btn-default" })</td>
-        </tr>-->
-    </tbody>
-</table>
+<div class="alert alert-info">
+    <p>These reports contain personal details. Please ensure that downloaded versions are kept confidential.</p>
+    <p>A password to open the report will be emailed to you.</p>
+</div>
+@if (Model.LoggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
+{
+    <h4>General Reports</h4>
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+            <tr>
+                <th>All Users</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>All SCEs</td>
+                <td>@Html.ActionLink("Download Report", "AllSCEs", "Reports", new {area = "admin"}, new {@class = "btn btn-default"})</td>
+            </tr>
+            <!-- <tr>
+                     <td>SCEs not signed up to a session</td>
+                     <td>Html.ActionLink("Download Report", "NotSignedUp", "Reports", new { area = "admin" }, new { class = "btn btn-default" })</td>
+                 </tr>-->
+        </tbody>
+    </table>
 
-<table class="table table-striped table-hover table-bordered">
-    <thead>
-        <tr>
-            <th>Not Signed Up</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>Interviewers Not Signed Up</td>
-            <td>@Html.ActionLink("Download Report", "InterviewersNotSignedUp", "Reports", new { area = "admin" }, new { @class = "btn btn-default" })</td>
-        </tr>
-        <tr>
-            <td>Observers Not Signed Up</td>
-            <td>@Html.ActionLink("Download Report", "ObserversNotSignedUp", "Reports", new { area = "admin" }, new { @class = "btn btn-default" })</td>
-        </tr>
-        <tr>
-            <td>Interviewers and Observers Not Signed Up</td>
-            <td>@Html.ActionLink("Download Report", "InterviewersAndObserversNotSignedUp", "Reports", new { area = "admin" }, new { @class = "btn btn-default" })</td>
-        </tr>
-        <!-- <tr>
-             <td>SCEs not signed up to a session</td>
-             <td>Html.ActionLink("Download Report", "NotSignedUp", "Reports", new { area = "admin" }, new { class = "btn btn-default" })</td>
-         </tr>-->
-    </tbody>
-</table>
-
+    <table class="table table-striped table-hover table-bordered">
+        <thead>
+            <tr>
+                <th>Not Signed Up</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>SCEs Not Signed Up</td>
+                <td>@Html.ActionLink("Download Report", "SCEsNotSignedUp", "Reports", new {area = "admin"}, new {@class = "btn btn-default"})</td>
+            </tr>
+            <!-- <tr>
+                     <td>SCEs not signed up to a session</td>
+                     <td>Html.ActionLink("Download Report", "NotSignedUp", "Reports", new { area = "admin" }, new { class = "btn btn-default" })</td>
+                 </tr>-->
+        </tbody>
+    </table>
+}
 
 <h4>Full Session Report</h4>
 <table class="table table-striped table-hover table-bordered">
@@ -92,7 +83,7 @@
         </tr>
     </tbody>
 </table>
-
+<div style="display: none;">
 <h4>Individual Session Reports by Site</h4>
 @if (!Model.Signups.HasContent())
 {
@@ -191,7 +182,7 @@ else
                 }
             </div>
 }
-
+    </div>
 @section Scripts
 {
     <script type="text/javascript">

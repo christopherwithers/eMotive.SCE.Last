@@ -47,6 +47,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MySql.Data.6.8.3\lib\net45\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="NHunspell">
+      <HintPath>..\packages\NHunspell.1.2.5359.26126\lib\net\NHunspell.dll</HintPath>
+    </Reference>
     <Reference Include="ServiceStack, Version=3.9.71.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\ServiceStack.3.9.71\lib\net35\ServiceStack.dll</HintPath>
@@ -87,6 +90,7 @@
     <Compile Include="Interfaces\EmailAttachment.cs" />
     <Compile Include="Interfaces\IAuditable.cs" />
     <Compile Include="Interfaces\IAuditService.cs" />
+    <Compile Include="Interfaces\IDictionaryService.cs" />
     <Compile Include="Interfaces\IEmailService.cs" />
     <Compile Include="Interfaces\IeMotiveConfigurationService.cs" />
     <Compile Include="Interfaces\IDocumentManagerService.cs" />
@@ -94,6 +98,9 @@
     <Compile Include="Interfaces\IReportService.cs" />
     <Compile Include="Objects\Audit\AuditRecord.cs" />
     <Compile Include="Objects\ConfiguarionService\SignupOptions.cs" />
+    <Compile Include="Objects\DictionaryService.cs" />
+    <Compile Include="Objects\Dictionary\TinyMCE\SearchRequest.cs" />
+    <Compile Include="Objects\Dictionary\TinyMCE\SearchResponse.cs" />
     <Compile Include="Objects\MimeType.cs" />
     <Compile Include="Objects\DocumentManagerService.cs" />
     <Compile Include="Objects\EditableEmail.cs" />
@@ -121,6 +128,14 @@
       <Project>{3185EB88-28B3-4997-AD51-023422F2E972}</Project>
       <Name>eMotive.Search</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Hunspellx64.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Hunspellx86.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -58,7 +58,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
        // [Inject]
         public INotificationService NotificationService { get; set; }
 
-        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin, UGC")]
         public ActionResult Index(UserSearch userSearch)
         {
             if (string.IsNullOrEmpty(userSearch.SortBy))
@@ -268,9 +268,11 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         public ActionResult CreateSCE()
         {
             var allGroups = groupManager.FetchGroups();
-            var dropDowns = new SCEFormData();
-            ViewBag.GradesDropDown = dropDowns.Grades;
-            ViewBag.TrustsDropDown = dropDowns.Trusts;
+            var GradesDropDown = formManager.FetchFormList("Grade").Collection;
+            var TrustDropDowns = formManager.FetchFormList("Trusts").Collection;
+            //    var dropDowns = new SCEFormData();
+            ViewBag.GradesDropDown = GradesDropDown;
+            ViewBag.TrustsDropDown = TrustDropDowns;
             ViewBag.GroupDropDown = allGroups;
 
             var sce = new SCEData { AllGroups = allGroups, Enabled = true };
@@ -288,6 +290,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
 
                 if (userManager.CreateSCE(sce, out id))
                 {
+                    userManager.SaveUserNotes(sce.Username, sce.Notes);
                     var successView = new SuccessView
                     {
                         Message = "The new SCE was successfully created.",
@@ -313,9 +316,11 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                 }
             }
             var allGroups = groupManager.FetchGroups();
-            var dropDowns = new SCEFormData();
-            ViewBag.GradesDropDown = dropDowns.Grades;
-            ViewBag.TrustsDropDown = dropDowns.Trusts;
+            var GradesDropDown = formManager.FetchFormList("Grade").Collection;
+            var TrustDropDowns = formManager.FetchFormList("Trusts").Collection;
+            //    var dropDowns = new SCEFormData();
+            ViewBag.GradesDropDown = GradesDropDown;
+            ViewBag.TrustsDropDown = TrustDropDowns;
             ViewBag.GroupDropDown = allGroups;
             sce.AllGroups = allGroups;
 
@@ -329,12 +334,15 @@ namespace eMotive.SCE.Areas.Admin.Controllers
             var user = userManager.Fetch(username);
             var userGroups = userManager.FetchProfile(username);
             var allGroups = groupManager.FetchGroups();
-            var dropDowns = new SCEFormData();
-            ViewBag.GradesDropDown = dropDowns.Grades;
-            ViewBag.TrustsDropDown = dropDowns.Trusts;
+            var GradesDropDown = formManager.FetchFormList("Grade").Collection;
+            var TrustDropDowns = formManager.FetchFormList("Trusts").Collection;
+        //    var dropDowns = new SCEFormData();
+            ViewBag.GradesDropDown = GradesDropDown;
+            ViewBag.TrustsDropDown = TrustDropDowns;
             ViewBag.GroupDropDown = allGroups;
             var sce = userManager.FetchSCEData(user.ID);
             sce.AllGroups = allGroups;
+            sce.IdUser = user.ID;
             sce.Forename = user.Forename;
             sce.Surname = user.Surname;
             sce.Email = user.Email;
@@ -389,9 +397,11 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                 }
             }
             var allGroups = groupManager.FetchGroups();
-            var dropDowns = new SCEFormData();
-            ViewBag.GradesDropDown = dropDowns.Grades;
-            ViewBag.TrustsDropDown = dropDowns.Trusts;
+            var GradesDropDown = formManager.FetchFormList("Grade").Collection;
+            var TrustDropDowns = formManager.FetchFormList("Trusts").Collection;
+            //    var dropDowns = new SCEFormData();
+            ViewBag.GradesDropDown = GradesDropDown;
+            ViewBag.TrustsDropDown = TrustDropDowns;
             ViewBag.GroupDropDown = allGroups;
             sce.AllGroups = allGroups;
 

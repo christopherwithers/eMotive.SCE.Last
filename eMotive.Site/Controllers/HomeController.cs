@@ -30,11 +30,10 @@ namespace eMotive.SCE.Controllers
             groupManager = _groupManager;
         }
 
-        [Authorize(Roles = "Interviewer")]
+        [Authorize(Roles = "SCE")]
         public ActionResult Index()
         {
             var user = userManager.Fetch(User.Identity.Name);
-            var profile = userManager.FetchProfile(user.Username);
 
             var replacements = new Dictionary<string, string>(4)
                     {
@@ -44,25 +43,17 @@ namespace eMotive.SCE.Controllers
 
             var homeView = signupManager.FetchHomeView(User.Identity.Name);
 
-            var PageSections = new Dictionary<string, PartialPage>();
+            Dictionary<string, PartialPage> pageSections;
 
 
-            if(profile.Groups.Any(n => n.Name == "Observer"))
-            {
+
                 if (homeView.HasSignedUp)
-                    PageSections = pageManager.FetchPartials(new[] { "Observer-Home-Header-Signed", "Observer-Home-Footer-Signed" }).ToDictionary(k => k.Key, v => v);
+                    pageSections = pageManager.FetchPartials(new[] { "SCE-Home-Header-Signed", "SCE-Home-Footer-Signed" }).ToDictionary(k => k.Key, v => v);
                 else
-                    PageSections = pageManager.FetchPartials(new[] { "Observer-Home-Header-Unsigned", "Observer-Home-Footer-Unsigned" }).ToDictionary(k => k.Key, v => v);
-            }
-            else
-            {
-                if (homeView.HasSignedUp)
-                    PageSections = pageManager.FetchPartials(new[] { "Interviewer-Home-Header-Signed", "Interviewer-Home-Footer-Signed" }).ToDictionary(k => k.Key, v => v);
-                else
-                    PageSections = pageManager.FetchPartials(new[] { "Interviewer-Home-Header-Unsigned", "Interviewer-Home-Footer-Unsigned" }).ToDictionary(k => k.Key, v => v);
-            }
+                    pageSections = pageManager.FetchPartials(new[] { "SCE-Home-Header-Unsigned", "SCE-Home-Footer-Unsigned" }).ToDictionary(k => k.Key, v => v);
+            
 
-            var modifiedSections = PageSections.ToDictionary(section => section.Key.Substring(section.Key.IndexOf('-') + 1), section => section.Value);
+            var modifiedSections = pageSections.ToDictionary(section => section.Key.Substring(section.Key.IndexOf('-') + 1), section => section.Value);
 
 
             homeView.PageSections = modifiedSections;
@@ -155,7 +146,7 @@ namespace eMotive.SCE.Controllers
 
         }
 
-        [Authorize(Roles = "Interviewer")]
+        [Authorize(Roles = "SCE")]
         public ActionResult ContactUs()
         {
             var contactUsPage = pageManager.Fetch("ContactUs");
