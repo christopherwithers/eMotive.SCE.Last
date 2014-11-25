@@ -41,7 +41,10 @@ namespace eMotive.Repository.Interfaces
         UserSignup FetchUserSignup(int _userId, IEnumerable<int> _groupIds);
         IEnumerable<UserSignup> FetchUserSignups(int _userId, IEnumerable<int> _groupIds);
 
-      //  IEnumerable<UserSignupProjection> FetchSignupProjectionsForUser(int _userId);
+        bool WillingToChangeSignup(WillingToChangeSignup change);
+        IEnumerable<WillingToChangeSignup> FetchWillingToChangeForSignup(int signupID);
+        IEnumerable<WillingToChangeSignup> FetchWillingToChangeForUser(int userID);
+        //  IEnumerable<UserSignupProjection> FetchSignupProjectionsForUser(int _userId);
 
     }
 }

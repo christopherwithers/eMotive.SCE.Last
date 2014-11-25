@@ -12,7 +12,7 @@ namespace eMotive.Managers.Interfaces
         Signup Fetch(int[] _ids);
 
         IEnumerable<Signup> FetchAll();
-
+        IEnumerable<Group> FetchGroups(IEnumerable<int> _ids);
         bool Save(mod.Signup signup);
 
         bool StandDownExaminers();
@@ -38,6 +38,10 @@ namespace eMotive.Managers.Interfaces
         IEnumerable<Group> FetchAllGroups();
 
         IEnumerable<mod.Signup> FetchRecordsFromSearch(SearchResult _searchResult);
+
+        bool WillingToChangeSignup(WillingToChangeSignup change);
+        IEnumerable<WillingToChangeSignup> FetchWillingToChangeForSignup(int signupID);
+        IEnumerable<WillingToChangeSignup> FetchWillingToChangeForUser(int userID);
 
         #region TESTING PULLING OUT SIGNUPS STRAIGHT FROM REP
         IEnumerable<mod.Signup> FetchAllM();

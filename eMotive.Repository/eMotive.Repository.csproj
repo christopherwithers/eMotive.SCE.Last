@@ -78,6 +78,7 @@
     <Compile Include="Objects\Signups\Slot.cs" />
     <Compile Include="Objects\Signups\UserSignup.cs" />
     <Compile Include="Objects\Signups\UserSignupProjection.cs" />
+    <Compile Include="Objects\Signups\WillingToChangeSignup.cs" />
     <Compile Include="Objects\Users\ApplicantData.cs" />
     <Compile Include="Objects\Users\Profile.cs" />
     <Compile Include="Objects\Users\Role.cs" />

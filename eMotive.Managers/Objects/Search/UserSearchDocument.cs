@@ -63,11 +63,8 @@ namespace eMotive.Managers.Objects.Search
                 foreach (var role in User.Roles)
                 {
                     field = new Field("Role", role.Name, Field.Store.NO, Field.Index.ANALYZED);
+                    doc.Add(field);
                     field = new Field("RoleID", role.ID.ToString(), Field.Store.NO, Field.Index.ANALYZED);
-                    //numericField = new NumericField("RoleID", Field.Store.NO, false);
-                   // numericField.SetIntValue(User.ID);
-                    doc.Add(numericField);
-
                     doc.Add(field);
                 }
             }

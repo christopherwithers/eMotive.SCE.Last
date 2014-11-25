@@ -167,7 +167,12 @@ namespace eMotive.Services.Objects
 
         public bool SendMail(string _key, string _to, IDictionary<string, string> _replacements)
         {
-           /* var email = FetchEmail(_key);
+            return SendMail(_key, _to, _replacements, null, string.Empty, string.Empty);
+        }
+
+        public bool SendMail(string _key, ICollection<string> _to, IDictionary<string, string> _replacements)
+        {
+            var email = FetchEmail(_key);
 
             if (email == null)
                 return false;
@@ -182,16 +187,17 @@ namespace eMotive.Services.Objects
             }
 
             var newEmail = new Email();
-            newEmail.To.Add(_to);
+            foreach (var address in _to)
+            {
+                newEmail.To.Add(address);
+            }
             newEmail.Title = email.Title;
             newEmail.Message = System.Net.WebUtility.HtmlDecode(sb.ToString());
             newEmail.IsBodyHtml = true;
             newEmail.From = config.EmailFromAddress();
             newEmail.Attachments = FetchEmailAttachments(_key);
 
-            return SendMail(newEmail);*/
-
-            return SendMail(_key, _to, _replacements, null, string.Empty, string.Empty);
+            return SendMail(newEmail);
         }
 
         public bool SendMail(string _key, string _to, IDictionary<string, string> _replacements, byte[] binaryAttachment, string _name, string _extension)

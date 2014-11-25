@@ -10,6 +10,9 @@ namespace eMotive.Services.Interfaces
     {
         bool SendMail(Objects.Email _email);
         bool SendMail(string _key, string _to, IDictionary<string, string> _replacements);
+
+        bool SendMail(string _key, ICollection<string> _to, IDictionary<string, string> _replacements);
+
         bool SendMail(string _key, string _to, IDictionary<string, string> _replacements, byte[] binaryAttachment, string _name, string _extension);
         bool SendMail(int _key, string _to, IDictionary<string, string> _replacements);
 

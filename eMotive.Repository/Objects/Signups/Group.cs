@@ -8,5 +8,8 @@
         public bool DisabilitySignups { get; set; }
         public bool AllowMultipleSignups { get; set; }
         public string Description { get; set; }
+
+        public bool AllowSelfSignup { get; set; }
+        public string SelfSignupDeniedMessage { get; set; }
     }
 }

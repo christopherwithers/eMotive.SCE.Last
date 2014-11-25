@@ -113,6 +113,7 @@
     <Compile Include="Objects\Signups\SessionDay.cs" />
     <Compile Include="Objects\Signups\ThirdPartySignupSessions.cs" />
     <Compile Include="Objects\Signups\ThirdPartySignupSlots.cs" />
+    <Compile Include="Objects\Signups\WillingToChangeSignup.cs" />
     <Compile Include="Objects\Uploads\UploadedDocument.cs" />
     <Compile Include="Objects\Uploads\UploadLocation.cs" />
     <Compile Include="Objects\Users\ApplicantData.cs" />

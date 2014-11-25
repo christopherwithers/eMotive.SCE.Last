@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using AutoMapper;
 using Cache.Interfaces;
 using eMotive.Managers.Objects.Search;
@@ -21,6 +22,7 @@ using eMotive.Services.Interfaces;
 using Lucene.Net.Search;
 using rep = eMotive.Repository.Objects.Signups;
 using emSearch = eMotive.Search.Objects.Search;
+using Group = eMotive.Models.Objects.Signups.Group;
 
 namespace eMotive.Managers.Objects
 {
@@ -87,7 +89,7 @@ namespace eMotive.Managers.Objects
             signup = Mapper.Map<rep.Signup, Signup>(repSignup);
 
             var locationDict = formManager.FetchFormList("Sites")
-                .Collection.ToDictionary(k => k.Value, v => new Location {ID = v.Value, Name = v.Text});
+                .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
 
             IDictionary<int, User> usersDict = null;
 
@@ -226,6 +228,11 @@ namespace eMotive.Managers.Objects
             return signupModels;
         }
 
+        public IEnumerable<Group> FetchGroups(IEnumerable<int> _ids)
+        {
+            return Mapper.Map<IEnumerable<rep.Group>, IEnumerable<Group>>(signupRepository.FetchGroups(_ids));
+        }
+
         public bool Save(Models.Objects.SignupsMod.Signup signup)
         {
             var repSignup = Mapper.Map<Models.Objects.SignupsMod.Signup, rep.Signup>(signup);
@@ -240,42 +247,42 @@ namespace eMotive.Managers.Objects
 
         public bool StandDownExaminers()
         {
-      /*    var signups = FetchAll();
+            /*    var signups = FetchAll();
 
-            if (signups.HasContent())
-            {
-                var filtered = signups.Where(n => n.Group.EnableEmails);
+                  if (signups.HasContent())
+                  {
+                      var filtered = signups.Where(n => n.Group.EnableEmails);
 
-                if (filtered.HasContent())
-                {
-                    foreach (var signup in filtered)
-                    {
-                        foreach (var slot in signup.Slots)
-                        {
-                            var replacements = new Dictionary<string, string>(4)
-                            {
-                                {"#forename#", user.Forename},
-                                {"#surname#", user.Surname},
-                                {"#SignupDate#", signup.Date.ToString("dddd d MMMM yyyy")},
-                                {"#SlotDescription#", slot.Description},
-                                {"#SignupDescription#", signup.Description},
-                                {"#GroupDescription#", signup.Group.Name},
-                                {"#username#", user.Username},
-                                {"#sitename#", configurationService.SiteName()},
-                                {"#siteurl#", configurationService.SiteURL()}
-                            };
+                      if (filtered.HasContent())
+                      {
+                          foreach (var signup in filtered)
+                          {
+                              foreach (var slot in signup.Slots)
+                              {
+                                  var replacements = new Dictionary<string, string>(4)
+                                  {
+                                      {"#forename#", user.Forename},
+                                      {"#surname#", user.Surname},
+                                      {"#SignupDate#", signup.Date.ToString("dddd d MMMM yyyy")},
+                                      {"#SlotDescription#", slot.Description},
+                                      {"#SignupDescription#", signup.Description},
+                                      {"#GroupDescription#", signup.Group.Name},
+                                      {"#username#", user.Username},
+                                      {"#sitename#", configurationService.SiteName()},
+                                      {"#siteurl#", configurationService.SiteURL()}
+                                  };
 
-                            if (emailService.SendMail("StandDownExaminers" user.Email, replacements))
-                            {
-                                emailService.SendEmailLog(key, user.Username);
-                                return true;
-                            }
-                        }
-                    }
-                }
+                                  if (emailService.SendMail("StandDownExaminers" user.Email, replacements))
+                                  {
+                                      emailService.SendEmailLog(key, user.Username);
+                                      return true;
+                                  }
+                              }
+                          }
+                      }
             
                 
-            }*/
+                  }*/
 
             return false;
         }
@@ -357,6 +364,21 @@ namespace eMotive.Managers.Objects
             return FetchM(_searchResult.Items.Select(n => n.ID).ToList());
         }
 
+        public bool WillingToChangeSignup(WillingToChangeSignup change)
+        {
+            return signupRepository.WillingToChangeSignup(Mapper.Map<WillingToChangeSignup, rep.WillingToChangeSignup>(change));
+        }
+
+        public IEnumerable<WillingToChangeSignup> FetchWillingToChangeForSignup(int signupID)
+        {
+            return Mapper.Map<IEnumerable<rep.WillingToChangeSignup>, IEnumerable<WillingToChangeSignup>>(signupRepository.FetchWillingToChangeForSignup(signupID));
+        }
+
+        public IEnumerable<WillingToChangeSignup> FetchWillingToChangeForUser(int userID)
+        {
+            return Mapper.Map<IEnumerable<rep.WillingToChangeSignup>, IEnumerable<WillingToChangeSignup>>(signupRepository.FetchWillingToChangeForUser(userID));
+        }
+
         public UserHomeView FetchHomeView(string _username)
         {
             //todo: fetch user and group
@@ -406,7 +428,7 @@ namespace eMotive.Managers.Objects
                             SignedUpSlotID = slot.id,
                             SignupID = signup.id,
                             Location = locationDict[signup.idSite.ToString(CultureInfo.InvariantCulture)],
-                            SignupGroup = new Group { Description = signup.Group.Description, AllowMultipleSignups = signup.Group.AllowMultipleSignups, ID = signup.Group.ID, Name = signup.Group.Name },
+                            SignupGroup = new Group { Description = signup.Group.Description, AllowMultipleSignups = signup.Group.AllowMultipleSignups, ID = signup.Group.ID, Name = signup.Group.Name, AllowSelfSignup = signup.Group.AllowSelfSignup },
                             SignupDescription = signup.Description,
                             Type = GenerateHomeViewSlotStatus(slot, user.ID)// slot.UsersSignedUp.Where(n => n.IdUser == user.ID).Single(t => t.Type)
                         };
@@ -864,6 +886,21 @@ namespace eMotive.Managers.Objects
             return slotView;
         }
 
+        private static bool IsValidEmail(string email)
+        {
+            if (String.IsNullOrEmpty(email))
+                return false;
+
+            const string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|"
+                                   + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)"
+                                   + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
+
+            var regex = new Regex(pattern, RegexOptions.IgnoreCase);
+
+
+            return regex.IsMatch(email);
+        }
+
         //todo: reindex signup
         public bool SignupToSlot(int _signupID, int _slotId, string _username)
         {
@@ -879,7 +916,7 @@ namespace eMotive.Managers.Objects
 
             //TODO: Check for null here?
             var user = userManager.Fetch(_username);
-            var profile = userManager.FetchProfile(_username);
+            //  var profile = userManager.FetchProfile(_username);
 
 
             object bodyLock;
@@ -939,6 +976,7 @@ namespace eMotive.Managers.Objects
                 {
                     if (signup.Group.EnableEmails)
                     {
+
                         //+1 to account for the signup we are currently processing
                         var SCEInterestedSignup = slot.ApplicantsSignedUp.HasContent() &&
                                             slot.ApplicantsSignedUp.Count() + slot.ReservePlaces + 1 > slot.TotalPlacesAvailable;
@@ -961,10 +999,30 @@ namespace eMotive.Managers.Objects
 
                         var key = string.Empty;
 
-                        if (user.Roles.Any(n => n.Name == "SCE"))
-                            key = "SCESessionSignup";
+                        var addresses = new Collection<string>();
 
-                     /*   if (user.Roles.Any(n => n.Name == "Interviewer"))
+                        if (IsValidEmail(user.Email))
+                            addresses.Add(user.Email);
+
+                        if (user.Roles.Any(n => n.Name == "SCE"))
+                        {
+                            key = "SCESessionSignup";
+                            var scedata = userManager.FetchSCEData(user.ID);
+
+                            if (scedata != null)
+                            {
+                                if (!string.IsNullOrEmpty(scedata.SecretaryEmail) && IsValidEmail(scedata.SecretaryEmail))
+                                {
+                                    addresses.Add(scedata.SecretaryEmail);
+                                }
+
+                                if (!string.IsNullOrEmpty(scedata.EmailOther) && IsValidEmail(scedata.EmailOther))
+                                {
+                                    addresses.Add(scedata.EmailOther);
+                                }
+                            }
+                        }
+                        /*   if (user.Roles.Any(n => n.Name == "Interviewer"))
                         {
                             if (signup.Group.Name == "Observer")
                             {
@@ -981,12 +1039,18 @@ namespace eMotive.Managers.Objects
                             key = "SCEInterestedSignup";
                         }
 
-
-                        if (emailService.SendMail(key, user.Email, replacements))
+                        if (addresses.HasContent())
                         {
-                            emailService.SendEmailLog(key, user.Username);
-                            return true;
+                            if (emailService.SendMail(key, addresses, replacements))
+                            {
+                                emailService.SendEmailLog(key, user.Username);
+                                return true;
+                            }
                         }
+                        //else
+                        //{
+                        //add error?
+                        //}
                         return true;
                     }
                     return true;
@@ -1065,36 +1129,89 @@ namespace eMotive.Managers.Objects
                         if (user.Roles.Any(n => n.Name == "SCE"))
                             key = "SCESessionCancel";
 
-                /*        if (user.Roles.Any(n => n.Name == "Interviewer"))
-                        {
-                            if (signup.Group.Name == "Observer")
-                                key = "ObserverSessionCancel";
-                            else
-                                key = reserveCancel ? "ReserveSessionCancel" : "InterviewerSessionCancel";
-                        }
-                        */
-
-                        if (emailService.SendMail(key, user.Email, replacements))
-                        {
-                            emailService.SendEmailLog(key, user.Username);
-
-
-                            if (BumpUser)
-                            {
-                                var users = slot.ApplicantsSignedUp.Select(n => n).OrderBy(n => n.SignupDate).ToArray();
-
-                                var UserToBump = users[slot.TotalPlacesAvailable /*+ slot.ReservePlaces*/ +1].User;
-
-
-                                key = "SlotUpgrade";
-
-                                if (emailService.SendMail(key, UserToBump.Email, replacements))
+                        /*        if (user.Roles.Any(n => n.Name == "Interviewer"))
                                 {
-                                    emailService.SendEmailLog(key, UserToBump.Username);
-                                    return true;
+                                    if (signup.Group.Name == "Observer")
+                                        key = "ObserverSessionCancel";
+                                    else
+                                        key = reserveCancel ? "ReserveSessionCancel" : "InterviewerSessionCancel";
+                                }
+                                */
+
+                        var addresses = new Collection<string>();
+
+                        if (IsValidEmail(user.Email))
+                            addresses.Add(user.Email);
+
+                        if (user.Roles.Any(n => n.Name == "SCE"))
+                        {
+                            key = "SCESessionSignup";
+                            var scedata = userManager.FetchSCEData(user.ID);
+
+                            if (scedata != null)
+                            {
+                                if (!string.IsNullOrEmpty(scedata.SecretaryEmail) && IsValidEmail(scedata.SecretaryEmail))
+                                {
+                                    addresses.Add(scedata.SecretaryEmail);
+                                }
+
+                                if (!string.IsNullOrEmpty(scedata.EmailOther) && IsValidEmail(scedata.EmailOther))
+                                {
+                                    addresses.Add(scedata.EmailOther);
                                 }
                             }
                         }
+                        if (addresses.HasContent())
+                        {
+                            if (emailService.SendMail(key, addresses, replacements))
+                            {
+                                emailService.SendEmailLog(key, user.Username);
+                            }
+                        }
+
+                        if (BumpUser)
+                        {
+                            var users = slot.ApplicantsSignedUp.Select(n => n).OrderBy(n => n.SignupDate).ToArray();
+
+                            var userToBump = users[slot.TotalPlacesAvailable /*+ slot.ReservePlaces*/ + 1].User;
+
+                            addresses = new Collection<string>();
+
+                            if (IsValidEmail(userToBump.Email))
+                                addresses.Add(userToBump.Email);
+
+                            if (userToBump.Roles.Any(n => n.Name == "SCE"))
+                            {
+                                var scebumpdata = userManager.FetchSCEData(user.ID);
+
+                                if (scebumpdata != null)
+                                {
+                                    if (!string.IsNullOrEmpty(scebumpdata.SecretaryEmail) && IsValidEmail(scebumpdata.SecretaryEmail))
+                                    {
+                                        addresses.Add(scebumpdata.SecretaryEmail);
+                                    }
+
+                                    if (!string.IsNullOrEmpty(scebumpdata.EmailOther) && IsValidEmail(scebumpdata.EmailOther))
+                                    {
+                                        addresses.Add(scebumpdata.EmailOther);
+                                    }
+                                }
+                            }
+
+
+
+
+                            key = "SlotUpgrade";
+                            if (addresses.HasContent())
+                            {
+                                if (emailService.SendMail(key, addresses, replacements))
+                                {
+                                    emailService.SendEmailLog(key, userToBump.Username);
+
+                                }
+                            }
+                        }
+
 
 
 

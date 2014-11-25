@@ -466,7 +466,7 @@ namespace eMotive.Repository.Objects
             {
                 connection.Open();
 
-                const string query = "INSERT INTO `groups` (`Name`, `AllowMultipleSignups`, `Description`, `EnableEmails`) VALUES (@name, @allowMultipleSignups, @description, @EnableEmails);";
+                const string query = "INSERT INTO `groups` (`Name`, `AllowMultipleSignups`, `Description`, `EnableEmails`,`AllowSelfSignup`, `SelfSignupDeniedMessage`) VALUES (@name, @allowMultipleSignups, @description, @EnableEmails, @allowSelfSignup, @selfSignupDeniedMessage);";
 
                 return connection.Execute(query, new
                 {
@@ -483,7 +483,7 @@ namespace eMotive.Repository.Objects
             {
                 connection.Open();
 
-                const string query = "UPDATE `groups` SET `Name`=@name, `AllowMultipleSignups`=@allowMultipleSignups, `Description`=@description, `EnableEmails`=@enableEmails WHERE `Id`=@id;";
+                const string query = "UPDATE `groups` SET `Name`=@name, `AllowMultipleSignups`=@allowMultipleSignups, `Description`=@description, `EnableEmails`=@enableEmails, `AllowSelfSignup`=@allowSelfSignup, `SelfSignupDeniedMessage`=@selfSignupDeniedMessage WHERE `Id`=@id;";
 
                 return connection.Execute(query, _group) > 0;
             }
@@ -495,7 +495,7 @@ namespace eMotive.Repository.Objects
             {
                 connection.Open();
 
-                const string sql = "SELECT b.`Id`, b.`Name`, b.`AllowMultipleSignups`, b.`Description` FROM `signup` a INNER JOIN `groups` b ON a.`idGroup`=b.`id` WHERE a.`id`=@signupId";
+                const string sql = "SELECT b.`Id`, b.`Name`, b.`AllowMultipleSignups`, b.`Description`, b.`AllowSelfSignup`, b.`SelfSignupDeniedMessage` FROM `signup` a INNER JOIN `groups` b ON a.`idGroup`=b.`id` WHERE a.`id`=@signupId";
 
                 return connection.Query<Group>(sql, new { signupId = _id }).SingleOrDefault();
             }
@@ -544,6 +544,59 @@ namespace eMotive.Repository.Objects
                 const string sql = "SELECT a.`id`, b.`id` AS 'IdSlot', c.`id` AS 'IdSignUp', c.`Date`, c.`Description`, a.`SignUpDate`  FROM `userhasslots` a INNER JOIN `slot` b ON a.`idSlot` = b.`id` INNER JOIN `signup` c ON b.`idSignUp` = c.`id` WHERE idSlot IN (SELECT `id` FROM `slot` WHERE idSignUp IN (SELECT `id` FROM `signup` WHERE idGroup IN @idGroups)) AND idUser=@idUser";
 
                 return connection.Query<UserSignup>(sql, new { idGroups = _groupIds, idUser = _userId });
+            }
+        }
+
+        public bool WillingToChangeSignup(WillingToChangeSignup change)
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                using (var transaction = new TransactionScope())
+                {
+                    var success = true;
+
+                    connection.Open();
+
+                    var sql = "SELECT CAST(COUNT(*) AS UNSIGNED INTEGER)  FROM `WillingToChangeSignup` WHERE `UserID`=@UserID AND `SignupID`=@SignupID;";
+                    var count = Convert.ToInt32(connection.Query<ulong>(sql, change).SingleOrDefault());
+                    if (count > 0)
+                    {
+                        sql = "DELETE FROM `WillingToChangeSignup` WHERE `UserID`=@UserID AND `SignupID`=@SignupID;";
+
+                        success &= connection.Execute(sql, change) > 0;
+                        
+                    }
+                    else
+                    {
+                        sql = "INSERT INTO `WillingToChangeSignup` (`UserID`, `SignupID`) VALUES (@UserID, @SignupID)";
+                        success &= connection.Execute(sql, change) > 0;
+                    }
+
+                    transaction.Complete();
+                    return success;
+                }
+            }
+        }
+
+        public IEnumerable<WillingToChangeSignup> FetchWillingToChangeForSignup(int signupID)
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                const string sql = "SELECT * FROM `WillingToChangeSignup` WHERE `SignupID`=@SignupID;";
+
+                return connection.Query<WillingToChangeSignup>(sql, new {SignupID = signupID});
+            }
+        }
+
+        public IEnumerable<WillingToChangeSignup> FetchWillingToChangeForUser(int userID)
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                const string sql = "SELECT * FROM `WillingToChangeSignup` WHERE `UserID`=@UserID;";
+
+                return connection.Query<WillingToChangeSignup>(sql, new { UserID = userID });
             }
         }
 

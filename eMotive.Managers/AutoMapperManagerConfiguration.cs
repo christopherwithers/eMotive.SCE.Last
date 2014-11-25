@@ -50,6 +50,9 @@ namespace eMotive.Managers
 
             Mapper.CreateMap<Signup, mSignups.Signup>();
 
+            Mapper.CreateMap<WillingToChangeSignup, mSignups.WillingToChangeSignup>();
+            Mapper.CreateMap<mSignups.WillingToChangeSignup, WillingToChangeSignup>();
+
             Mapper.CreateMap<Slot, mSignups.Slot>().ForMember(m => m.TotalPlacesAvailable, o => o.MapFrom(m => m.PlacesAvailable));
             Mapper.CreateMap<UserSignup, mSignups.UserSignup>();
             Mapper.CreateMap<Group, mSignups.Group>();

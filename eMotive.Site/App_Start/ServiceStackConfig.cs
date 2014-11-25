@@ -77,6 +77,7 @@ namespace eMotive.SCE
                     authService.SaveSession(session, SessionExpiry);
                     if (session.UserAuthName == null)
                         session.UserAuthName = userName;
+
                     OnAuthenticated(authService, session, null, null);
 
                     return new AuthResponse

@@ -4,13 +4,15 @@ using System.Linq;
 using eMotive.Managers.Interfaces;
 using eMotive.Managers.Objects.Search;
 using eMotive.MMI.SignalR;
-using eMotive.Models.Objects.SignupsMod;
+using eMotive.Models.Objects.Signups;
 using eMotive.Search.Interfaces;
 using eMotive.Services.Interfaces;
 using Microsoft.AspNet.SignalR;
 using ServiceStack.Common;
 using ServiceStack.ServiceHost;
 using ServiceStack.ServiceInterface;
+using Signup = eMotive.Models.Objects.SignupsMod.Signup;
+using UserSlotView = eMotive.Models.Objects.SignupsMod.UserSlotView;
 
 
 namespace eMotive.Api
@@ -63,6 +65,11 @@ namespace eMotive.Api
     {
     }
 
+    [Route("/Sessions/Signup/WillingToChange", "POST")]
+    public class WillingToChange : WillingToChangeSignup
+    {
+    }
+
 
     [Authenticate] 
     public class SessionService : Service
@@ -110,6 +117,29 @@ namespace eMotive.Api
             {
                 Success = success,
                 Result = result,
+                Errors = issues
+            };
+        }
+
+        public object Post(WillingToChange request)
+        {
+            if (_sessionManager.WillingToChangeSignup(request))
+            {
+                return new ServiceResult<bool>
+                {
+                    Success = true,
+                    Result = true,
+                    Errors = null
+                };
+            }
+
+            var issues = NotificationService.FetchIssues();
+
+            return new ServiceResult<bool>
+            {
+
+                Success = false,
+                Result = false,
                 Errors = issues
             };
         }

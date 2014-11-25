@@ -72,17 +72,6 @@ namespace eMotive.SCE.Controllers
                     partial.Text = sb.ToString();
                 }
             }
-
-            var sceDetails = userManager.FetchSCEData(user.ID);
-
-            if (sceDetails != null)
-            {
-                var signupGroup = groupManager.FetchGroup(sceDetails.MainSpecialty);
-
-                if(signupGroup != null)
-                    ViewBag.GroupDetails = signupGroup.Description;
-            }
-
             return View(homeView);
         }
 

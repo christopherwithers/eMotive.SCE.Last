@@ -58,6 +58,10 @@ namespace eMotive.SCE.Controllers
             signups.HeaderText = pageText["SCE-Session-List-Header"];
             signups.FooterText = pageText["SCE-Session-List-Footer"];
 
+            signups.GroupDictionary = signupManager.FetchGroups(signups.SignupInformation.Select(n => n.Group.ID)).ToDictionary(k => k.Name,  v=> v);
+            signups.LoggedInUser = userManager.Fetch(User.Identity.Name);
+            signups.WillingToChange = signupManager.FetchWillingToChangeForUser(signups.LoggedInUser.ID);
+
             return View(signups);
         }
 
