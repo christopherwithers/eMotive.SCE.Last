@@ -1011,6 +1011,7 @@ namespace eMotive.Managers.Objects
 
                             if (scedata != null)
                             {
+                                replacements.Add("#title#", scedata.Title);
                                 if (!string.IsNullOrEmpty(scedata.SecretaryEmail) && IsValidEmail(scedata.SecretaryEmail))
                                 {
                                     addresses.Add(scedata.SecretaryEmail);
@@ -1110,17 +1111,17 @@ namespace eMotive.Managers.Objects
                         
                         }*/
                         var replacements = new Dictionary<string, string>(4)
-                    {
-                        {"#forename#", user.Forename},
-                        {"#surname#", user.Surname},
-                        {"#SignupDate#", signup.Date.ToString("dddd d MMMM yyyy")},
-                        {"#SlotDescription#", slot.Description},
-                        {"#username#", user.Username},
-                        {"#SignupDescription#", signup.Description},
-                        {"#GroupDescription#", signup.Group.Name},
-                        {"#sitename#", configurationService.SiteName()},
-                        {"#siteurl#", configurationService.SiteURL()}
-                    };
+                                            {
+                                                {"#forename#", user.Forename},
+                                                {"#surname#", user.Surname},
+                                                {"#SignupDate#", signup.Date.ToString("dddd d MMMM yyyy")},
+                                                {"#SlotDescription#", slot.Description},
+                                                {"#username#", user.Username},
+                                                {"#SignupDescription#", signup.Description},
+                                                {"#GroupDescription#", signup.Group.Name},
+                                                {"#sitename#", configurationService.SiteName()},
+                                                {"#siteurl#", configurationService.SiteURL()}
+                                            };
 
                         //  string key = "UserSessionCancel";
 
@@ -1145,11 +1146,13 @@ namespace eMotive.Managers.Objects
 
                         if (user.Roles.Any(n => n.Name == "SCE"))
                         {
-                            key = "SCESessionSignup";
+                            key = "SCESessionCancel";
                             var scedata = userManager.FetchSCEData(user.ID);
 
                             if (scedata != null)
                             {
+                                replacements.Add("#title#", scedata.Title);
+
                                 if (!string.IsNullOrEmpty(scedata.SecretaryEmail) && IsValidEmail(scedata.SecretaryEmail))
                                 {
                                     addresses.Add(scedata.SecretaryEmail);
@@ -1173,7 +1176,7 @@ namespace eMotive.Managers.Objects
                         {
                             var users = slot.ApplicantsSignedUp.Select(n => n).OrderBy(n => n.SignupDate).ToArray();
 
-                            var userToBump = users[slot.TotalPlacesAvailable /*+ slot.ReservePlaces*/ + 1].User;
+                            var userToBump = users[slot.TotalPlacesAvailable /*+ slot.ReservePlaces*/ /*+ 1*/].User;
 
                             addresses = new Collection<string>();
 
@@ -1186,6 +1189,7 @@ namespace eMotive.Managers.Objects
 
                                 if (scebumpdata != null)
                                 {
+                                    replacements.Add("#title#", scebumpdata.Title);
                                     if (!string.IsNullOrEmpty(scebumpdata.SecretaryEmail) && IsValidEmail(scebumpdata.SecretaryEmail))
                                     {
                                         addresses.Add(scebumpdata.SecretaryEmail);

@@ -49,6 +49,7 @@
             <br/><br />
             @Html.DropDownListFor(m => m.SelectedRoleFilter, new SelectList(Model.RoleFilter, "key", "value"))
             <a href="@Url.Action("Index")" class="btn btn-inverse">Clear <i class="icon-remove icon-white"></i></a>
+            <div class="well" id="sceFilters" style="display:none;"></div>
         }
     </div>
 </div>
@@ -117,6 +118,14 @@ else
                                     }
                                 }
                                 
+                                @if (((User)ViewBag.LoggedInUser).Roles.Any(n => n.Name == "UGC"))
+                                {
+                                    if (user.Roles.Any(n => n.Name == "SCE"))
+                                    {
+                                        <li><a href="@Url.Action("EditSCE", new {username = user.Username})">Edit User</a></li>
+                                    }
+                                }
+                                
                                 @if (((User)ViewBag.LoggedInUser).Roles.Any(n =>  n.Name == "Super Admin"))
                                 {
                                     if (user.Roles.Any(n => n.Name == "Super Admin"))
@@ -125,7 +134,7 @@ else
                                     }
                                 }
                                 <li><a href="#" onclick="UserActions.FetchEmailLog('@user.Username','@user.Forename','@user.Surname')">View Emails Sent</a></li>
-                                <li><a href="#" onclick="UserActions.FetchSessionLog('@user.Username','@user.Forename','@user.Surname')">View Sessions</a></li>
+                                <!--<li><a href="#" onclick="UserActions.FetchSessionLog('@user.Username','@user.Forename','@user.Surname')">View Sessions</a></li>-->
                                 <li><a href="#" onclick="UserActions.ResendAccountCreationEmail('@user.Username')">Resend Account Information Email</a></li>
                                 @if (((User) ViewBag.LoggedInUser).Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
                                 {
@@ -238,7 +247,15 @@ else
 {
 <script src="~/Scripts/eMotive/UserActionsFunctions.js?v=1"></script>
 <script src="~/Scripts/eMotive/Closures/UserActions.js?v=1"></script>
+    <script>
+        //sceFilters
+       // $(function() {
 
+            //    if ($("option:selected", this).text() == "SCE")
+              //      $("#sceFilters").show();
+
+      //  });
+    </script>
 
 }
 @Html.Partial("_tinymceEditor")

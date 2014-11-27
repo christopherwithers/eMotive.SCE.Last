@@ -430,6 +430,7 @@ namespace eMotive.Managers.Objects
                     {"Forename", new emSearch.SearchTerm {Field = _search.Query, Term = Occur.SHOULD}},
                     {"Surname", new emSearch.SearchTerm {Field = _search.Query, Term = Occur.SHOULD}},
                     {"Email", new emSearch.SearchTerm {Field = _search.Query, Term = Occur.SHOULD}},
+                    {"GMCNumber", new emSearch.SearchTerm {Field = _search.Query, Term = Occur.SHOULD}},
                 };
          
             }
@@ -441,16 +442,41 @@ namespace eMotive.Managers.Objects
         public void ReindexSearchRecords()
         {
             var records = userRep.FetchAll();
+            var users = records.Where(n => n.Roles.Any(m => m.Name != "SCE"));
+            var sces = records.Where(n => n.Roles.Any(m => m.Name == "SCE"));
 
-            if (!records.HasContent())
+            if (!users.HasContent())
             {
                 //todo: send an error message here
                 return;
             }
 
-            foreach (var item in records)
+            foreach (var item in users)
             {
                 searchManager.Add(new UserSearchDocument(item));
+            }
+
+            if (!sces.HasContent())
+            {
+                //todo: send an error message here
+                return;
+            }
+
+            var sceData = userRep.FetchSceData(sces.Select(n => n.ID));
+            var userDict = sces.ToDictionary(k => k.ID, v => v);
+
+            foreach (var data in sceData)
+            {
+                data.Username = userDict[data.IdUser].Username;
+                data.Forename = userDict[data.IdUser].Forename;
+                data.Surname = userDict[data.IdUser].Surname;
+                data.Email = userDict[data.IdUser].Email;
+                data.Archived = userDict[data.IdUser].Archived;
+            }
+
+            foreach (var item in sceData)
+            {
+                searchManager.Add(new SCESearchDocument(item));
             }
         }
 

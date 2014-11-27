@@ -59,7 +59,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                         Links = new[]
                             {
                                 new SuccessView.Link {Text = "Edit new page", URL = @Url.Action("Edit", "Pages", new {key = page.Key})},
-                                new SuccessView.Link {Text = "Return to pages home", URL = "/MMI/Admin/Pages"}
+                                new SuccessView.Link {Text = "Return to pages home", URL = @Url.Action("Index", "Pages")}
                             }
                     };
 

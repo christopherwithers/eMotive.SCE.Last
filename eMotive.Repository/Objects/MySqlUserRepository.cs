@@ -426,6 +426,20 @@ namespace eMotive.Repository.Objects
             }
         }
 
+        public IEnumerable<SCEData> FetchSceData(IEnumerable<int> _ids)
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+
+                var sql = "SELECT * FROM `scereference` WHERE `idUser` IN @ids;";
+
+                var sceData = connection.Query<SCEData>(sql, new{ids = _ids});
+
+                return sceData;
+            }
+        }
+
         public SCEData FetchSceData(int _id)
         {
             using (var connection = new MySqlConnection(connectionString))

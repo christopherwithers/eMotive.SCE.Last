@@ -100,7 +100,8 @@
         $("#NotesUsernameTitle").html("Notes for " + _username);
         $("#NotesUsername").val(_username);
 
-        Ajax.DoQuery(window.Routes.URL("FetchUserNotes"), function (data) { $('#NotesText').html(data.results); }, { username: _username });
+        // Ajax.DoQuery(window.Routes.URL("FetchUserNotes"), function (data) { $('#NotesText').html(data.results); }, { username: _username });
+        Ajax.DoQuery(window.Routes.URL("FetchUserNotes"), function (data) { tinyMCE.activeEditor.setContent(data.results); }, { username: _username });
         $("#NotesModal").modal({ show: true });
     };
 

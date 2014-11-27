@@ -96,7 +96,7 @@ namespace eMotive.SCE.Controllers
         public ActionResult Slots(int? id)
         {
             var slots = signupManager.FetchSlotInformation(id.HasValue ? id.Value : -1, User.Identity.Name);
-            var user = userManager.Fetch(User.Identity.Name);
+       //     var user = userManager.Fetch(User.Identity.Name);
 
             Dictionary<string, string> pageText;
 
@@ -108,9 +108,9 @@ namespace eMotive.SCE.Controllers
             {
                 var replacements = new Dictionary<string, string>(4)
                 {
-                    {"#interviewdate#", slots.Date.ToString("dddd d MMMM yyyy")},
-                    {"#description#", slots.Description},
-                    {"#group#", slots.Group.Name}
+                    {"#signupdate#", slots.Date.ToString("dddd d MMMM yyyy")},
+                    {"#signupdescription#", slots.Description},
+                    {"#groupdescription#", slots.Group.Name}
                 };
 
                 var sbHead = new StringBuilder(pageText["SCE-Interview-Date-Page"]);

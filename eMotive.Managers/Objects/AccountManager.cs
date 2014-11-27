@@ -133,8 +133,12 @@ namespace eMotive.Managers.Objects
                     key = "CreateUGCAccount";
 
                 if (_user.Roles.Any(n => n.Name == "SCE"))
+                {
                     key = "CreateSCEAccount";
-
+                    var scedata = userRepository.FetchSceData(_user.ID);
+                    if(scedata != null)
+                        replacements.Add("#title#", scedata.Title);
+                }
                 if (emailService.SendMail(key, _user.Email, replacements))
                 {
                     emailService.SendEmailLog(key, _user.Username);
@@ -184,10 +188,14 @@ namespace eMotive.Managers.Objects
                     key = "CreateUGCAccount";
 
                 if (user.Roles.Any(n => n.Name == "SCE"))
+                {
                     key = "CreateSCEAccount";
+                    var scedata = userRepository.FetchSceData(user.ID);
+                    if (scedata != null)
+                        replacements.Add("#title#", scedata.Title);
+                }
 
 
-                
 
                 if (emailService.SendMail(key, user.Email, replacements))
                 {
@@ -235,6 +243,13 @@ namespace eMotive.Managers.Objects
 
                 const string key = "UserResetPassword";
 
+                if (user.Roles.Any(n => n.Name == "SCE"))
+                {
+                    var scedata = userRepository.FetchSceData(user.ID);
+                    if (scedata != null)
+                        replacements.Add("#title#", scedata.Title);
+                }
+
                 if (emailService.SendMail(key, _email, replacements))
                 {
                     emailService.SendEmailLog(key, user.Username);
@@ -265,6 +280,13 @@ namespace eMotive.Managers.Objects
                     {"#sitename#", configurationService.SiteName()},
                     {"#siteurl#", configurationService.SiteURL()}
                 };
+
+            if (user.Roles.Any(n => n.Name == "SCE"))
+            {
+                var scedata = userRepository.FetchSceData(user.ID);
+                if (scedata != null)
+                    replacements.Add("#title#", scedata.Title);
+            }
 
             const string key = "UserRequestUsername";
 

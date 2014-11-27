@@ -82,6 +82,7 @@
     <Compile Include="Objects\Search\NewsSearchDocument.cs" />
     <Compile Include="Objects\Search\RoleSearchDocument.cs" />
     <Compile Include="Objects\Search\SignupSearchDocument.cs" />
+    <Compile Include="Objects\Search\SCESearchDocument.cs" />
     <Compile Include="Objects\Search\UserSearchDocument.cs" />
     <Compile Include="Objects\SCESessionManager.cs" />
     <Compile Include="Objects\SessionManager.cs" />

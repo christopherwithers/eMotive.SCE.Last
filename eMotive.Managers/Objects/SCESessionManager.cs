@@ -50,8 +50,8 @@ namespace eMotive.Managers.Objects
 
             if (!_params.MultipleSignupsPerGroup)
             {
-                //if (_params.UserHasSignup && !_params.MultipleSignupsPerSignup)
-                 //   return SlotStatus.Clash;
+                if (_params.UserHasSignup && !_params.MultipleSignupsPerSignup)
+                    return SlotStatus.Clash;
 
                 return SlotStatus.Signup;
             }

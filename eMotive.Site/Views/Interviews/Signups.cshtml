@@ -98,7 +98,7 @@ else
                     if (!string.IsNullOrEmpty(description))
                      {
                          <div class="alert-info alert">
-                             @Html.Raw(Server.HtmlDecode(description)))
+                             @Html.Raw(Server.HtmlDecode(description))
                          </div>
                      }
                     <table class="table table-striped table-hover">
@@ -124,7 +124,7 @@ else
                                     </td>
                                     <td>@signup.Date.ToString("dddd d MMMM yyyy")</td>
 
-                                    <td>@signup.Location.Name</td>
+                                    <td>@signup.Description</td>
                                     <td id="signup_value_@signup.ID">@signup.SlotsAvailableString()</td>
                                     <td>
 

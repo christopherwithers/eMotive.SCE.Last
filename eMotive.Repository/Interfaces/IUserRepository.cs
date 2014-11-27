@@ -28,6 +28,7 @@ namespace eMotive.Repository.Interfaces
 
         Profile FetchProfile(string _username);
 
+        IEnumerable<SCEData> FetchSceData(IEnumerable<int> _ids);
         SCEData FetchSceData(int _id);
         bool Create(SCEData _sce);
         bool Update(SCEData _sce);

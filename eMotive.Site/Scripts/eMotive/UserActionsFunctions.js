@@ -41,8 +41,9 @@
             { Username: $("#DeleteID").val() });
     });
 
-    $("#SaveNotes").click(function () {
-        Ajax.DoQuery(window.Routes.URL("SaveUserNotes"), function (data) { $("#NotesModal").modal('toggle'); }, { username: $("#NotesUsername").val(), notes: $("#NotesText").val() });
+    $("#SaveNotes").click(function () {//tinyMCE.activeEditor.setContent(data.results);
+      //  Ajax.DoQuery(window.Routes.URL("SaveUserNotes"), function (data) { $("#NotesModal").modal('toggle'); }, { username: $("#NotesUsername").val(), notes: $("#NotesText").val() });
+        Ajax.DoQuery(window.Routes.URL("SaveUserNotes"), function (data) { $("#NotesModal").modal('toggle'); }, { username: $("#NotesUsername").val(), notes: tinyMCE.activeEditor.getContent() });
     });
 
     $("#SelectedRoleFilter").change(function () {

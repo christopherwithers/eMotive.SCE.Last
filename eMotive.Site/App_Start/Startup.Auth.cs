@@ -16,7 +16,7 @@ namespace eMotive
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
                 LoginPath = new PathString("/Account/Login"),
-                CookieName = "UoBMMI",
+                CookieName = "UoBSCE",
                 ExpireTimeSpan = TimeSpan.FromMinutes(20),
                 SlidingExpiration = true
                // CookieSecure = CookieSecureOption.Always
