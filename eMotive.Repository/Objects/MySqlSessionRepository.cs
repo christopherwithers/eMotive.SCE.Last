@@ -212,6 +212,88 @@ namespace eMotive.Repository.Objects
             }
         }
 
+        public IEnumerable<Signup> FetchSignupsForUser(int _userId)
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+
+                //Fetch all signup information which is assigned to any of the passed _groupIds
+                var sql = "SELECT * FROM `Signup` a INNER JOIN `groups` b ON a.`idGroup` = b.`id` WHERE a.`id` IN (SELECT `idSignUp` FROM slot c INNER JOIN `UserHasSlots` d ON c.`id` = d.`idSlot` WHERE d.`idUser`=@userId);";
+                var signUps = connection.Query<Signup, Group, Signup>(sql, (signupDTO, groupDTO) => { signupDTO.Group = groupDTO; return signupDTO; }, new { userId = _userId });
+
+                if (signUps.HasContent())
+                {
+                    //get all signupIds
+                    var qIds = signUps.Select(n => n.id);
+
+                    //select all slots which belong to the passed in signup ids
+                    sql = "SELECT * FROM `slot` WHERE `idSignUp` in @ids;";
+                    var slots = connection.Query<Slot>(sql, new { ids = qIds });
+
+                    if (slots.HasContent())
+                    {
+                        //get all slot ids
+                        qIds = slots.Select(n => n.id);
+
+                        //pull out any applicants assigned to any of the slot ids we have passed in
+                        // sql = "SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate`FROM `UserHasSlots` a INNER JOIN `users` b ON a.id=b.id WHERE a.`idSlot` IN @ids;";
+                        sql = "SELECT a.`id`, a.`idslot`, a.`idUser`, a.`SignUpDate`FROM `UserHasSlots` a INNER JOIN `users` b ON a.idUser=b.id WHERE a.`idSlot` IN @ids ORDER BY `SignUpDate`, `idSlot` DESC;";
+                        var userSignups = connection.Query<UserSignup>(sql, new { ids = qIds });
+
+                        if (userSignups.HasContent())
+                        {
+                            //build a dictionary of userSignups against slot id
+                            var signDict = userSignups.GroupBy(k => k.IdSlot, v => v).ToDictionary(k => k.Key, v => v.ToList());
+
+                            //loop through slots and add all userSignups to a slot if a match is found
+                            foreach (var slot in slots)
+                            {
+                                foreach (var userSignup in signDict)
+                                {
+                                    if (slot.id == userSignup.Key)
+                                    {
+                                        slot.UsersSignedUp = userSignup.Value;
+
+                                        var i = 0;
+                                        foreach (var user in slot.UsersSignedUp)
+                                        {
+                                            i++;
+                                            if (i <= slot.PlacesAvailable)
+                                            {
+                                                continue;
+                                            }
+
+                                            user.Type = i <= (slot.PlacesAvailable + slot.ReservePlaces) ? SlotType.Reserve : SlotType.Interested;
+
+                                        }
+
+                                    }
+
+                                }
+                            }
+                        }
+
+                        //build a dictionary of slots against signupid
+                        var slotDict = slots.GroupBy(k => k.IdSignUp, v => v).ToDictionary(k => k.Key, v => v.ToList());
+
+                        //loop through signups and add all slots to a signup if a match is found
+                        foreach (var si in signUps)
+                        {
+                            foreach (var slot in slotDict)
+                            {
+                                if (si.id == slot.Key)
+                                    si.Slots = slot.Value;
+                            }
+                        }
+                    }
+                }
+
+                return signUps;
+
+            }
+        }
+
         public IEnumerable<Signup> FetchAllTraining()
         {
             using (var connection = new MySqlConnection(connectionString))
@@ -509,6 +591,11 @@ namespace eMotive.Repository.Objects
 
                 return connection.Query<int>(sql, new { idSignup = _signupId }).SingleOrDefault();
             }
+        }
+
+        public UserSignup FetchUserSignup(int _userId, int _groupId)
+        {
+            throw new NotImplementedException();
         }
 
         /* public UserSignup FetchUserSignup(int _userId, int _groupId)

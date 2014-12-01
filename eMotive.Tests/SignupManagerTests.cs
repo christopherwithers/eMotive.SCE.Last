@@ -132,7 +132,7 @@ namespace eMotive.Tests
             #endregion
 
             var mocks = new MockRepository();
-            signupManager = mocks.StrictMock<SCESessionManager>(signupRepository, userManager);
+            signupManager = mocks.StrictMock<SessionManager>(signupRepository, userManager);
 
         }
 

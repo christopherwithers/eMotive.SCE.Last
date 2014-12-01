@@ -11,6 +11,8 @@ namespace eMotive.Repository.Interfaces
         IEnumerable<Signup> FetchSignupsByGroup(IEnumerable<int> _groupIds);
         IEnumerable<Signup> FetchSignups(IEnumerable<int> _ids);
 
+        IEnumerable<Signup> FetchSignupsForUser(int _userId);
+
         IEnumerable<Signup> FetchAllTraining();
         IEnumerable<Signup> FetchAll();
         Signup Fetch(int _id);
@@ -37,7 +39,7 @@ namespace eMotive.Repository.Interfaces
 
         //TODO: HAVE A SIGNUPINFO CLASS FOR USERS WHO HAVE SIGNED UP?? COULD CONTAIN IDSIGNUP, IDSLOT ETC
 
-       // UserSignup FetchUserSignup(int _userId, int _groupId);
+        UserSignup FetchUserSignup(int _userId, int _groupId);
         UserSignup FetchUserSignup(int _userId, IEnumerable<int> _groupIds);
         IEnumerable<UserSignup> FetchUserSignups(int _userId, IEnumerable<int> _groupIds);
 

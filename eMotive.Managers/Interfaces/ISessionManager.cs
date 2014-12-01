@@ -47,8 +47,8 @@ namespace eMotive.Managers.Interfaces
         IEnumerable<mod.Signup> FetchAllM();
         mod.Signup FetchM(int _id);
         IEnumerable<mod.Signup> FetchM(IEnumerable<int> _ids);
-        mod.UserSignup FetchUserSignup(int _userId, IEnumerable<int> _groupIds);
-        IEnumerable<mod.UserSignup> FetchUserSignups(int _userId, IEnumerable<int> _groupIds);
+     //   mod.UserSignup FetchUserSignup(int _userId, IEnumerable<int> _groupIds);
+       // IEnumerable<mod.UserSignup> FetchUserSignups(int _userId, IEnumerable<int> _groupIds);
         #endregion
     }
 }

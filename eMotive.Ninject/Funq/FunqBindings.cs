@@ -68,7 +68,7 @@ namespace eMotive.IoCBindings.Funq
                 notificationService = c.Resolve<INotificationService>(),
             }).ReusedWithin(ReuseScope.Request);
 
-            container.Register<ISessionManager>(c => new SCESessionManager(c.Resolve<ISessionRepository>(), c.Resolve<IUserManager>(), c.Resolve<ISearchManager>(), c.Resolve<IFormManager>())
+            container.Register<ISessionManager>(c => new SessionManager(c.Resolve<ISessionRepository>(), c.Resolve<IUserManager>(), c.Resolve<ISearchManager>(), c.Resolve<IFormManager>())
             {
                 configurationService = c.Resolve<IeMotiveConfigurationService>(),
                 notificationService = c.Resolve<INotificationService>(),

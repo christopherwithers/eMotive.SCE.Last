@@ -118,7 +118,6 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                     worksheet.Cells[x, ++i].Value = "Phone Work";
                     worksheet.Cells[x, ++i].Value = "Phone Mobile";
                     worksheet.Cells[x, ++i].Value = "Phone Other";
-                    worksheet.Cells[x, ++i].Value = "Trained";
                     worksheet.Cells[x, ++i].Value = "Trained Date";
                     worksheet.Cells[x, ++i].Value = "Trained Within 3 Years";
                     worksheet.Cells[x, ++i].Value = "Enabled";
@@ -161,9 +160,8 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                         worksheet.Cells[x, ++i].Value = user.PhoneWork;
                         worksheet.Cells[x, ++i].Value = user.PhoneMobile;
                         worksheet.Cells[x, ++i].Value = user.PhoneOther;
-                        worksheet.Cells[x, ++i].Value = user.Trained ? "Yes" : "No";
                         worksheet.Cells[x, ++i].Value = user.DateTrained.ToString("D");
-                        worksheet.Cells[x, ++i].Value = user.DateTrained != default(DateTime) ? (user.DateTrained > DateTime.Now.AddYears(-3) ? "Yes" : "No") : string.Empty;
+                        worksheet.Cells[x, ++i].Value = user.Trained ? "Yes" : "No";
  
                      //   worksheet.Cells[x, ++i].Value = user;
                         worksheet.Cells[x, ++i].Value = user.Enabled ? "Yes" : "No";
@@ -424,7 +422,6 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                 worksheet.Cells[x, ++i].Value = "Phone Work";
                 worksheet.Cells[x, ++i].Value = "Phone Mobile";
                 worksheet.Cells[x, ++i].Value = "Phone Other";
-                worksheet.Cells[x, ++i].Value = "Trained";
                 worksheet.Cells[x, ++i].Value = "Trained Date";
                 worksheet.Cells[x, ++i].Value = "Trained Within 3 Years";
                 worksheet.Cells[x, ++i].Value = "Enabled";
@@ -467,9 +464,9 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                     worksheet.Cells[x, ++i].Value = user.PhoneWork;
                     worksheet.Cells[x, ++i].Value = user.PhoneMobile;
                     worksheet.Cells[x, ++i].Value = user.PhoneOther;
-                    worksheet.Cells[x, ++i].Value = user.Trained ? "Yes" : "No";
+                    
                     worksheet.Cells[x, ++i].Value = user.DateTrained.ToString("D");
-                    worksheet.Cells[x, ++i].Value = user.DateTrained != default(DateTime) ? (user.DateTrained > DateTime.Now.AddYears(-3) ? "Yes" : "No") : string.Empty;
+                    worksheet.Cells[x, ++i].Value = user.Trained ? "Yes" : "No";
                     worksheet.Cells[x, ++i].Value = user.Enabled ? "Yes" : "No";
 
                     if (loggedInUser != null && loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))

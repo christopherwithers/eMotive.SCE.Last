@@ -84,7 +84,6 @@
     <Compile Include="Objects\Search\SignupSearchDocument.cs" />
     <Compile Include="Objects\Search\SCESearchDocument.cs" />
     <Compile Include="Objects\Search\UserSearchDocument.cs" />
-    <Compile Include="Objects\SCESessionManager.cs" />
     <Compile Include="Objects\SessionManager.cs" />
     <Compile Include="Objects\Signups\GenerateSlotStatusDTO.cs" />
     <Compile Include="Objects\UserManager.cs" />
