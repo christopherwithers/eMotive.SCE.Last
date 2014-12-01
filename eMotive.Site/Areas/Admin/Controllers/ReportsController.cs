@@ -6,7 +6,6 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using eMotive.Managers.Interfaces;
-using eMotive.Models.Objects.Account;
 using eMotive.Models.Objects.Reports.Users;
 using eMotive.Models.Objects.Signups;
 using eMotive.Services.Interfaces;
@@ -64,7 +63,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         public FileStreamResult AllSCEs()
         {
             var users = reportService.FetchAllSCEs();
-
+            //var sces = 
             if (users.HasContent())
             {
                 using (var xlPackage = new ExcelPackage())
@@ -78,35 +77,50 @@ namespace eMotive.SCE.Areas.Admin.Controllers
 
                     SendPassword(password, reportName);
                     worksheet.Cells[1,1].Value = "This report contain personal details. Please ensure that it is kept confidential.";
-                    using (var r = worksheet.Cells["A1:S1"])
+                    using (var r = worksheet.Cells["A1:X1"])
                     {
                         r.Style.Fill.PatternType = ExcelFillStyle.Solid;
                         r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(122, 255, 94, 0));
                         r.Style.Font.Bold = true;
-                        r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                     }
                     int x = 2;
-                    using (var r = worksheet.Cells["A2:S2"])
+                    using (var r = worksheet.Cells["A2:X2"])
                     {
                         r.Style.Fill.PatternType = ExcelFillStyle.Solid;
                         r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(171, 205, 250));
                         r.Style.Font.Bold = true;
-                        r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                     }
                     //18
                     int i = 0;
+                    var trustDict = formManager.FetchFormList("Trusts").Collection.ToDictionary(k => k.Value, v=> v.Text);
+                    var gradeDict = formManager.FetchFormList("Grade").Collection.ToDictionary(k => k.Value, v => v.Text);
+                   // var siteDict = formManager.FetchFormList("Sites").Collection.ToDictionary(k => k.Value, v => v.Text);
+                    var groupDict = groupManager.FetchGroups().ToDictionary(k => k.ID, v => v.Name);
 
                     worksheet.Cells[x, ++i].Value = "Username";
                     worksheet.Cells[x, ++i].Value = "Title";
                     worksheet.Cells[x, ++i].Value = "Forename";
                     worksheet.Cells[x, ++i].Value = "Surname";
+                    worksheet.Cells[x, ++i].Value = "GMC Number";
+                    worksheet.Cells[x, ++i].Value = "Main Specialty";
                     worksheet.Cells[x, ++i].Value = "Email";
                     worksheet.Cells[x, ++i].Value = "SecretaryEmail";
                     worksheet.Cells[x, ++i].Value = "OtherEmail";
-                    worksheet.Cells[x, ++i].Value = "PhoneWork";
-                    worksheet.Cells[x, ++i].Value = "PhoneMobile";
-                    worksheet.Cells[x, ++i].Value = "PhoneOther";
+                    worksheet.Cells[x, ++i].Value = "Trust";
+                    worksheet.Cells[x, ++i].Value = "Grade";
+                    worksheet.Cells[x, ++i].Value = "Address 1";
+                    worksheet.Cells[x, ++i].Value = "Address 2";
+                    worksheet.Cells[x, ++i].Value = "City";
+                    worksheet.Cells[x, ++i].Value = "Region";
+                    worksheet.Cells[x, ++i].Value = "Postcode";
+                    worksheet.Cells[x, ++i].Value = "Phone Work";
+                    worksheet.Cells[x, ++i].Value = "Phone Mobile";
+                    worksheet.Cells[x, ++i].Value = "Phone Other";
                     worksheet.Cells[x, ++i].Value = "Trained";
+                    worksheet.Cells[x, ++i].Value = "Trained Date";
+                    worksheet.Cells[x, ++i].Value = "Trained Within 3 Years";
                     worksheet.Cells[x, ++i].Value = "Enabled";
 
                   //  if (loggedInUser != null && loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
@@ -120,7 +134,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                     {
                         if (!user.Enabled)
                         {
-                            using (var r = worksheet.Cells[string.Concat("A", x, ":S", x)])
+                            using (var r = worksheet.Cells[string.Concat("A", x, ":X", x)])
                             {
                                 r.Style.Fill.PatternType = ExcelFillStyle.Solid;
                                 r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 203, 203));
@@ -132,13 +146,26 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                         worksheet.Cells[x, ++i].Value = user.Title;
                         worksheet.Cells[x, ++i].Value = user.Forename;
                         worksheet.Cells[x, ++i].Value = user.Surname;
+                        worksheet.Cells[x, ++i].Value = user.GMCNumber;
+                        worksheet.Cells[x, ++i].Value = groupDict[user.MainSpecialty];
                         worksheet.Cells[x, ++i].Value = user.Email;
                         worksheet.Cells[x, ++i].Value = user.SecretaryEmail;
                         worksheet.Cells[x, ++i].Value = user.OtherEmail;
+                        worksheet.Cells[x, ++i].Value = trustDict[user.Trust];
+                        worksheet.Cells[x, ++i].Value = gradeDict[user.Grade];
+                        worksheet.Cells[x, ++i].Value = user.Address1;
+                        worksheet.Cells[x, ++i].Value = user.Address2;
+                        worksheet.Cells[x, ++i].Value = user.City;
+                        worksheet.Cells[x, ++i].Value = user.Region;
+                        worksheet.Cells[x, ++i].Value = user.Postcode;
                         worksheet.Cells[x, ++i].Value = user.PhoneWork;
                         worksheet.Cells[x, ++i].Value = user.PhoneMobile;
                         worksheet.Cells[x, ++i].Value = user.PhoneOther;
                         worksheet.Cells[x, ++i].Value = user.Trained ? "Yes" : "No";
+                        worksheet.Cells[x, ++i].Value = user.DateTrained.ToString("D");
+                        worksheet.Cells[x, ++i].Value = user.DateTrained != default(DateTime) ? (user.DateTrained > DateTime.Now.AddYears(-3) ? "Yes" : "No") : string.Empty;
+ 
+                     //   worksheet.Cells[x, ++i].Value = user;
                         worksheet.Cells[x, ++i].Value = user.Enabled ? "Yes" : "No";
 
                       //  if (loggedInUser != null && loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
@@ -340,7 +367,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         public FileStreamResult SCEsNotSignedUp()
         {
             var loggedInUser = userManager.Fetch(User.Identity.Name);
-            var users = reportService.FetchInterviewersNotSignedUp();
+            var users = reportService.FetchSCEsNotSignedUp();
 
             if (!users.HasContent()) return null;
 
@@ -357,34 +384,49 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                 SendPassword(password, reportName);
 
                 worksheet.Cells[1, 1].Value = "This report contain personal details. Please ensure that it is kept confidential.";
-                using (var r = worksheet.Cells["A1:S1"])
+                using (var r = worksheet.Cells["A1:X1"])
                 {
                     r.Style.Fill.PatternType = ExcelFillStyle.Solid;
                     r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(122, 255, 94, 0));
                     r.Style.Font.Bold = true;
-                    r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                 }
                 int x = 2;
-                using (var r = worksheet.Cells["A2:S2"])
+                using (var r = worksheet.Cells["A2:X2"])
                 {
                     r.Style.Fill.PatternType = ExcelFillStyle.Solid;
                     r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(171, 205, 250));
                     r.Style.Font.Bold = true;
-                    r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                    r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                 }
                 var i = 0;
+                var trustDict = formManager.FetchFormList("Trusts").Collection.ToDictionary(k => k.Value, v => v.Text);
+                var gradeDict = formManager.FetchFormList("Grade").Collection.ToDictionary(k => k.Value, v => v.Text);
+                // var siteDict = formManager.FetchFormList("Sites").Collection.ToDictionary(k => k.Value, v => v.Text);
+                var groupDict = groupManager.FetchGroups().ToDictionary(k => k.ID, v => v.Name);
 
                 worksheet.Cells[x, ++i].Value = "Username";
                 worksheet.Cells[x, ++i].Value = "Title";
                 worksheet.Cells[x, ++i].Value = "Forename";
                 worksheet.Cells[x, ++i].Value = "Surname";
+                worksheet.Cells[x, ++i].Value = "GMC Number";
+                worksheet.Cells[x, ++i].Value = "Main Specialty";
                 worksheet.Cells[x, ++i].Value = "Email";
                 worksheet.Cells[x, ++i].Value = "SecretaryEmail";
                 worksheet.Cells[x, ++i].Value = "OtherEmail";
-                worksheet.Cells[x, ++i].Value = "PhoneWork";
-                worksheet.Cells[x, ++i].Value = "PhoneMobile";
-                worksheet.Cells[x, ++i].Value = "PhoneOther";
+                worksheet.Cells[x, ++i].Value = "Trust";
+                worksheet.Cells[x, ++i].Value = "Grade";
+                worksheet.Cells[x, ++i].Value = "Address 1";
+                worksheet.Cells[x, ++i].Value = "Address 2";
+                worksheet.Cells[x, ++i].Value = "City";
+                worksheet.Cells[x, ++i].Value = "Region";
+                worksheet.Cells[x, ++i].Value = "Postcode";
+                worksheet.Cells[x, ++i].Value = "Phone Work";
+                worksheet.Cells[x, ++i].Value = "Phone Mobile";
+                worksheet.Cells[x, ++i].Value = "Phone Other";
                 worksheet.Cells[x, ++i].Value = "Trained";
+                worksheet.Cells[x, ++i].Value = "Trained Date";
+                worksheet.Cells[x, ++i].Value = "Trained Within 3 Years";
                 worksheet.Cells[x, ++i].Value = "Enabled";
 
                 if (loggedInUser != null && loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
@@ -398,7 +440,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                 {
                     if (!user.Enabled)
                     {
-                        using (var r = worksheet.Cells[string.Concat("A", x, ":S", x)])
+                        using (var r = worksheet.Cells[string.Concat("A", x, ":X", x)])
                         {
                             r.Style.Fill.PatternType = ExcelFillStyle.Solid;
                             r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(255, 203, 203));
@@ -410,18 +452,29 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                     worksheet.Cells[x, ++i].Value = user.Title;
                     worksheet.Cells[x, ++i].Value = user.Forename;
                     worksheet.Cells[x, ++i].Value = user.Surname;
+                    worksheet.Cells[x, ++i].Value = user.GMCNumber;
+                    worksheet.Cells[x, ++i].Value = groupDict[user.MainSpecialty];
                     worksheet.Cells[x, ++i].Value = user.Email;
                     worksheet.Cells[x, ++i].Value = user.SecretaryEmail;
                     worksheet.Cells[x, ++i].Value = user.OtherEmail;
+                    worksheet.Cells[x, ++i].Value = trustDict[user.Trust];
+                    worksheet.Cells[x, ++i].Value = gradeDict[user.Grade];
+                    worksheet.Cells[x, ++i].Value = user.Address1;
+                    worksheet.Cells[x, ++i].Value = user.Address2;
+                    worksheet.Cells[x, ++i].Value = user.City;
+                    worksheet.Cells[x, ++i].Value = user.Region;
+                    worksheet.Cells[x, ++i].Value = user.Postcode;
                     worksheet.Cells[x, ++i].Value = user.PhoneWork;
                     worksheet.Cells[x, ++i].Value = user.PhoneMobile;
                     worksheet.Cells[x, ++i].Value = user.PhoneOther;
-                    worksheet.Cells[x, 13].Value = user.Trained ? "Yes" : "No";
+                    worksheet.Cells[x, ++i].Value = user.Trained ? "Yes" : "No";
+                    worksheet.Cells[x, ++i].Value = user.DateTrained.ToString("D");
+                    worksheet.Cells[x, ++i].Value = user.DateTrained != default(DateTime) ? (user.DateTrained > DateTime.Now.AddYears(-3) ? "Yes" : "No") : string.Empty;
                     worksheet.Cells[x, ++i].Value = user.Enabled ? "Yes" : "No";
 
                     if (loggedInUser != null && loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
                     {
-                        worksheet.Cells[x, 15].Value = user.Notes;
+                        worksheet.Cells[x, ++i].Value = user.Notes;
                     }
 
                     x++;
@@ -707,13 +760,17 @@ namespace eMotive.SCE.Areas.Admin.Controllers
             }
         }
 
-        public FileStreamResult FullInterviewReport()
-        {
+
+
+        public FileStreamResult FullSessionReport()
+        {//willingToChange.Any(n => n.SignupID == SignupID && n.UserID == UserID);
+
             var loggedInUser = userManager.Fetch(User.Identity.Name);
             var signups = signupManager.FetchAll();
 
             if (signups != null)
             {
+                var willingToChange = reportService.FetchWillingToChangeSignups().ToArray();
                 using (var xlPackage = new ExcelPackage())
                 {
 
@@ -727,45 +784,47 @@ namespace eMotive.SCE.Areas.Admin.Controllers
 
                     SendPassword(password, reportName);
                     worksheet.Cells[1, 1].Value = "This report contain personal details. Please ensure that it is kept confidential.";
-                    using (var r = worksheet.Cells["A1:U1"])
+                    using (var r = worksheet.Cells["A1:W1"])
                     {
                         r.Style.Fill.PatternType = ExcelFillStyle.Solid;
                         r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(122, 255, 94, 0));
                         r.Style.Font.Bold = true;
-                        r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                     }
                     int x = 2;
-                    using (var r = worksheet.Cells["A2:U2"])
+                    using (var r = worksheet.Cells["A2:W2"])
                     {
                         r.Style.Fill.PatternType = ExcelFillStyle.Solid;
                         r.Style.Fill.BackgroundColor.SetColor(Color.FromArgb(171, 205, 250));
                         r.Style.Font.Bold = true;
-                        r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+                        r.Style.HorizontalAlignment = ExcelHorizontalAlignment.Left;
                     }
                     worksheet.Cells[x, 1].Value = "Date";
                     worksheet.Cells[x, 2].Value = "Specialty";
                     worksheet.Cells[x, 3].Value = "Location";
                     worksheet.Cells[x, 4].Value = "Slot";
                     worksheet.Cells[x, 5].Value = "Place";
-                    worksheet.Cells[x, 6].Value = "Date Signed Up";
-                    worksheet.Cells[x, 7].Value = "Username";
-                    worksheet.Cells[x, 8].Value = "Title";
-                    worksheet.Cells[x, 9].Value = "Forename";
-                    worksheet.Cells[x, 10].Value = "Surname";
-                    worksheet.Cells[x, 11].Value = "GMCNumber";
-                    worksheet.Cells[x, 12].Value = "Home Trust";
-                    worksheet.Cells[x, 13].Value = "Email";
-                    worksheet.Cells[x, 14].Value = "SecretaryEmail";
-                    worksheet.Cells[x, 15].Value = "OtherEmail";
-                    worksheet.Cells[x, 16].Value = "PhoneWork";
-                    worksheet.Cells[x, 17].Value = "PhoneMobile";
-                    worksheet.Cells[x, 18].Value = "PhoneOther";
-                    worksheet.Cells[x, 19].Value = "Trained";
-                    worksheet.Cells[x, 20].Value = "Enabled";
+                    worksheet.Cells[x, 6].Value = "Happy To Move";
+                    worksheet.Cells[x, 7].Value = "Date Signed Up";
+                    worksheet.Cells[x, 8].Value = "Username";
+                    worksheet.Cells[x, 9].Value = "Title";
+                    worksheet.Cells[x, 10].Value = "Forename";
+                    worksheet.Cells[x, 11].Value = "Surname";
+                    worksheet.Cells[x, 12].Value = "GMCNumber";
+                    worksheet.Cells[x, 13].Value = "Home Trust";
+                    worksheet.Cells[x, 14].Value = "Grade";
+                    worksheet.Cells[x, 15].Value = "Email";
+                    worksheet.Cells[x, 16].Value = "SecretaryEmail";
+                    worksheet.Cells[x, 17].Value = "OtherEmail";
+                    worksheet.Cells[x, 18].Value = "PhoneWork";
+                    worksheet.Cells[x, 19].Value = "PhoneMobile";
+                    worksheet.Cells[x, 20].Value = "PhoneOther";
+                    worksheet.Cells[x, 21].Value = "Trained Within 3 Years";
+                    worksheet.Cells[x, 22].Value = "Date Trained";
 
                     if (loggedInUser != null && loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
                     {
-                        worksheet.Cells[x, 21].Value = "Notes";
+                        worksheet.Cells[x, 23].Value = "Notes";
                     }
 
                     x++;
@@ -779,8 +838,15 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                     else
                         userDict = reportService.FetchSCEData(userIDs).ToDictionary(k => k.Username, v => v);
 
+                    var trustDict = formManager.FetchFormList("Trusts").Collection.ToDictionary(k => k.Value, v => v.Text);
+                    var gradeDict = formManager.FetchFormList("Grade").Collection.ToDictionary(k => k.Value, v => v.Text);
+                    // var siteDict = formManager.FetchFormList("Sites").Collection.ToDictionary(k => k.Value, v => v.Text);
+               //     var groupDict = groupManager.FetchGroups().ToDictionary(k => k.ID, v => v.Name);
+
+
                     foreach (var signup in signups)
                     {
+                        
                         foreach (var slot in signup.Slots.OrderBy(n => n.Time))
                         {
                             var users = slot.ApplicantsSignedUp.HasContent() ? slot.ApplicantsSignedUp.OrderBy(n => n.SignupDate).ToArray() : new UserSignup[] { };
@@ -802,34 +868,28 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                                     worksheet.Cells[x, 3].Value = signup.Description;
                                     worksheet.Cells[x, 4].Value = slot.Description;
                                     worksheet.Cells[x, 5].Value = slotType;
-                                    worksheet.Cells[x, 6].Value = users[slotCount].SignupDate.ToString("f");
-                                    worksheet.Cells[x, 7].Value = sceData.Username;
-                                    worksheet.Cells[x, 8].Value = sceData.Title;
-                                    worksheet.Cells[x, 9].Value = sceData.Forename;
-                                    worksheet.Cells[x, 10].Value = sceData.Surname;
-                                    worksheet.Cells[x, 11].Value = sceData.GMCNumber;
+                                    worksheet.Cells[x, 6].Value = willingToChange.Any(n => n.SignupID == signup.ID && n.UserID == sceData.UserID) ? "Yes" : "No";
+                                    worksheet.Cells[x, 7].Value = users[slotCount].SignupDate.ToString("f");
+                                    worksheet.Cells[x, 8].Value = sceData.Username;
+                                    worksheet.Cells[x, 9].Value = sceData.Title;
+                                    worksheet.Cells[x, 10].Value = sceData.Forename;
+                                    worksheet.Cells[x, 11].Value = sceData.Surname;
+                                    worksheet.Cells[x, 12].Value = sceData.GMCNumber;
+                                    worksheet.Cells[x, 13].Value = trustDict[sceData.Trust];
+                                    worksheet.Cells[x, 14].Value = gradeDict[sceData.Grade];
 
-
-                                    string trust;
-
-                                    /*if (!sceFormData.Trusts.TryGetValue(sceData.Trust, out trust))
-                                    {
-                                        trust = "Unknwon";
-                                    }
-
-                                    worksheet.Cells[x, 12].Value = trust;*/
-                                    worksheet.Cells[x, 13].Value = sceData.Email;
-                                    worksheet.Cells[x, 14].Value = sceData.SecretaryEmail;
-                                    worksheet.Cells[x, 15].Value = sceData.OtherEmail;
-                                    worksheet.Cells[x, 16].Value = sceData.PhoneWork;
-                                    worksheet.Cells[x, 17].Value = sceData.PhoneMobile;
-                                    worksheet.Cells[x, 18].Value = sceData.PhoneOther;
-                                    worksheet.Cells[x, 19].Value = sceData.Trained ? "Yes" : "No";
-                                    worksheet.Cells[x, 20].Value = sceData.Enabled ? "Yes" : "No";
+                                    worksheet.Cells[x, 15].Value = sceData.Email;
+                                    worksheet.Cells[x, 16].Value = sceData.SecretaryEmail;
+                                    worksheet.Cells[x, 17].Value = sceData.OtherEmail;
+                                    worksheet.Cells[x, 18].Value = sceData.PhoneWork;
+                                    worksheet.Cells[x, 19].Value = sceData.PhoneMobile;
+                                    worksheet.Cells[x, 20].Value = sceData.PhoneOther;
+                                    worksheet.Cells[x, 21].Value = sceData.DateTrained != default(DateTime) ? (sceData.DateTrained > DateTime.Now.AddYears(-3) ? "Yes" : "No") : string.Empty;
+                                    worksheet.Cells[x, 22].Value = sceData.DateTrained.ToString("D");
 
                                     if (loggedInUser != null && loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))
                                     {
-                                        worksheet.Cells[x, 21].Value = sceData.Notes;
+                                        worksheet.Cells[x, 23].Value = sceData.Notes;
                                     }
 
                                 }

@@ -43,7 +43,7 @@ namespace eMotive.Services.Objects
         {
             using (var connection = new MySqlConnection(connectionString))
             {
-                const string sql = "SELECT * FROM `Users` a INNER JOIN `SceReference` b ON a.`ID`=b.`idUser` WHERE a.`ID` IN @ids;";
+                const string sql = "SELECT a.`ID` AS 'UserID',a.*, b.* FROM `Users` a INNER JOIN `SceReference` b ON a.`ID`=b.`idUser` WHERE a.`ID` IN @ids;";
 
                 return connection.Query<SCEReportItem>(sql, new {ids = _userIds});
             }
@@ -61,7 +61,18 @@ namespace eMotive.Services.Objects
                 return connection.Query<InterviewerReportItem>(sql);
             }
         }
+        public IEnumerable<SCEReportItem> FetchSCEsNotSignedUp()
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                //const string sql = "SELECT a.* FROM `users` a INNER JOIN `userhasroles` b ON a.`ID` = b.`UserId` WHERE b.RoleID=4 AND `ID` NOT IN (SELECT `IdUser` FROM `userhasslots`);";
+                const string sql =
+                    "SELECT users.*, interviewerReference.* FROM `Users` users INNER JOIN `UserhasRoles` userHasRoles ON users.id=userHasRoles.UserID INNER JOIN `Roles` roles ON userHasRoles.`RoleId` = roles.`ID` INNER JOIN `scereference` interviewerreference ON users.`ID`=interviewerReference.`idUser` WHERE roles.`Name`='SCE' AND users.ID NOT IN (SELECT idUser FROM `UserHasSlots`);";
 
+                return connection.Query<SCEReportItem>(sql);
+            }
+        }
 
 
         public IEnumerable<InterviewerReportItem> FetchInterviewersNotSignedUp()
@@ -123,6 +134,16 @@ namespace eMotive.Services.Objects
                     "SELECT users.*, interviewerReference.*, GROUP_CONCAT(groups.Name) AS 'Groups' FROM `Users` users INNER JOIN `UserhasRoles` userHasRoles ON users.id=userHasRoles.UserID INNER JOIN `Roles` roles ON userHasRoles.`RoleId` = roles.`ID` INNER JOIN `scereference` interviewerreference ON users.`ID`=interviewerReference.`idUser` INNER JOIN `userhasgroups` userHasGroups ON users.`ID`= userHasGroups.`IdUser` INNER JOIN `Groups` groups ON userHasGroups.`IdGroup` = groups.`ID` WHERE roles.`Name`='Interviewer' AND users.ID NOT IN (SELECT idUser FROM `UserHasSlots`) GROUP BY users.ID;";
 
                 return connection.Query<InterviewerReportItem>(sql);
+            }
+        }
+
+        public IEnumerable<WillingToChangeSignup> FetchWillingToChangeSignups()
+        {
+            using (var connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                const string sql = "SELECT * FROM `WillingToChangeSignup`;";
+                return connection.Query<WillingToChangeSignup>(sql);
             }
         }
     }

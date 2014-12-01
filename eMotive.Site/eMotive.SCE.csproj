@@ -1044,6 +1044,7 @@
     <Content Include="Global.asax" />
     <Content Include="Core\SpellChecker\en-GB.aff" />
     <Content Include="Core\SpellChecker\en-GB.dic" />
+    <Content Include="Areas\Admin\Views\Shared\_tinymceEditorAjax.cshtml" />
     <None Include="Hunspellx64.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

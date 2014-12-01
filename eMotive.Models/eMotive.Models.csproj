@@ -92,6 +92,7 @@
     <Compile Include="Objects\Pages\PartialPage.cs" />
     <Compile Include="Objects\Reports\Users\InterviewerReportItem.cs" />
     <Compile Include="Objects\Reports\Users\SCEReportItem.cs" />
+    <Compile Include="Objects\Reports\Users\WillingToChangeSignup.cs" />
     <Compile Include="Objects\Roles\Role.cs" />
     <Compile Include="Objects\Search\BasicSearch.cs" />
     <Compile Include="Objects\Search\Paging.cs" />

@@ -130,77 +130,6 @@ namespace eMotive.SCE.Areas.Admin.Controllers
             };
         }
 
-       // [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
-     /*   public CustomJsonResult SessionAttendanceCertificate(string username, int trainingSession)
-        {
-            var pdf = new ActionAsPdf("SessionAttendanceCertificateLayout", new { username = username, id = trainingSession }) { FileName = "Certificate.pdf" };
-
-            bool emailSent = false;
-
-            if (pdf != null)
-            {
-                var user = userManager.Fetch(username);
-                var sceData = userManager.FetchSCEData(user.ID);
-                var replacements = new Dictionary<string, string>(4)
-                    {
-                        {"#title#", sceData.Title},
-                        {"#forename#", user.Forename},
-                        {"#surname#", user.Surname},
-                        {"#username#", user.Username},
-                        {"#sitename#", configurationService.SiteName()},
-                        {"#siteurl#", configurationService.SiteURL()}
-                    };
-
-                const string key = "TrainingCertificate";
-
-                var pdfBin = pdf.BuildPdf(ControllerContext);
-
-                emailSent = EmailService.SendMail(key, user.Email, replacements, pdfBin, "TrainingCertificate.pdf", "pdf");
-                if (emailSent)
-                {
-                    EmailService.SendEmailLog(key, user.Username);
-                }
-
-            }
-
-            var issues = NotificationService.FetchIssues();
-
-            return new CustomJsonResult
-            {
-                Data = new { success = emailSent, message = issues, results = "" }
-            };
-        }
-        public ActionResult SessionAttendanceCertificateLayout(string username, int id)
-        {
-            var user = userManager.Fetch(username);
-            if (signupManager.RegisterAttendanceToSession(new SessionAttendance { SessionID = id, UserID = user.ID }))
-            {
-                var sceData = userManager.FetchSCEData(user.ID);
-
-                //    var sessions = signupManager.FetchSignupInformation(username);
-
-                var session = signupManager.Fetch(id);
-
-                var RCPCode = signupManager.FetchRCPActivityCode(id);
-
-                var formData = new SCEFormData();
-                var certificate = new SCECertificate
-                {
-                    Title = sceData.Title,
-                    Forename = user.Forename,
-                    Surname = user.Surname,
-                    DateOfCourse = string.Format(new MyCustomDateProvider(), "{0}", session.Date),
-                    Grade = formData.Grades[sceData.Grade],
-                    RCPNumber = RCPCode.ToString(CultureInfo.InvariantCulture),
-                    Trust = formData.Trusts[sceData.Trust],
-                    DateSigned = string.Format(new MyCustomDateProvider(), "{0}", DateTime.Now)
-                };
-
-                return View(certificate);
-            }
-            return null;
-        }*/
-
         public CustomJsonResult SessionAttendanceCertificate(string username)
         {
             var pdf = new ActionAsPdf("SessionAttendanceCertificateLayout", new { username = username}) { FileName = "Certificate.pdf" };
@@ -332,7 +261,6 @@ namespace eMotive.SCE.Areas.Admin.Controllers
 
 
         [HttpGet]
-        [ValidateInput(false)]
         [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
         public ActionResult CreateSCE()
         {
@@ -350,7 +278,6 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [ValidateInput(false)]
         [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
         public ActionResult CreateSCE(SCEData sce)
         {
@@ -398,7 +325,6 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        [ValidateInput(false)]
         [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
         public ActionResult EditSCE(string username)
         {
@@ -424,7 +350,6 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [ValidateInput(false)]
         [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
         public ActionResult EditSCE(SCEData sce)
         {

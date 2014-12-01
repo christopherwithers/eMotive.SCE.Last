@@ -8,12 +8,14 @@ namespace eMotive.Services.Interfaces
         IEnumerable<SCEReportItem> FetchAllSCEs();
         IEnumerable<SCEReportItem> FetchUsersNotSignedUp();
         IEnumerable<SCEReportItem> FetchSCEData(IEnumerable<int> _userIds);
-
+        IEnumerable<SCEReportItem> FetchSCEsNotSignedUp();
         IEnumerable<InterviewerReportItem> FetchAllInterviewers();
         IEnumerable<InterviewerReportItem> FetchInterviewersNotSignedUp();
         IEnumerable<InterviewerReportItem> FetchAllObservers();
         IEnumerable<InterviewerReportItem> FetchObserversNotSignedUp();
         IEnumerable<InterviewerReportItem> FetchAllInterviewersAndObservers();
         IEnumerable<InterviewerReportItem> FetchInterviewersAndObserversNotSignedUp();
+
+        IEnumerable<WillingToChangeSignup> FetchWillingToChangeSignups();
     }
 }

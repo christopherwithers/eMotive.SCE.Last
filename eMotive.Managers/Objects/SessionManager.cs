@@ -978,8 +978,8 @@ namespace eMotive.Managers.Objects
                     {
 
                         //+1 to account for the signup we are currently processing
-                        var SCEInterestedSignup = slot.ApplicantsSignedUp.HasContent() &&
-                                            slot.ApplicantsSignedUp.Count() + slot.ReservePlaces + 1 > slot.TotalPlacesAvailable;
+                        var SCEInterestedSignup = slot.ApplicantsSignedUp.HasContent() && slot.ApplicantsSignedUp.Count() >
+                                             slot.ReservePlaces + slot.TotalPlacesAvailable;
                         // slot.ApplicantsSignedUp.Single(n => n.ID == 0).ID = id;
                         var replacements = new Dictionary<string, string>(4)
                         {
@@ -1093,7 +1093,7 @@ namespace eMotive.Managers.Objects
 
             lock (bodyLock)
             {//todo: NOTE that SCE bumps from interested to reserve. MMI bumps from reserve to main
-                var BumpUser = slot.ApplicantsSignedUp.FindIndex(n => n.User.ID == user.ID) + 1 <= slot.TotalPlacesAvailable && slot.ApplicantsSignedUp.Count() > slot.TotalPlacesAvailable;//slot.ApplicantsSignedUp.Count() > slot.TotalPlacesAvailable;// + slot.ReservePlaces;
+                var BumpUser = slot.ApplicantsSignedUp.FindIndex(n => n.User.ID == user.ID) <= slot.TotalPlacesAvailable + slot.ReservePlaces && slot.ApplicantsSignedUp.Count() > slot.TotalPlacesAvailable + slot.ReservePlaces;//slot.ApplicantsSignedUp.Count() > slot.TotalPlacesAvailable;// + slot.ReservePlaces;
 
                 if (signupRepository.CancelSignupToSlot(_slotId, user.ID))
                 {
@@ -1110,18 +1110,7 @@ namespace eMotive.Managers.Objects
                         {
                         
                         }*/
-                        var replacements = new Dictionary<string, string>(4)
-                                            {
-                                                {"#forename#", user.Forename},
-                                                {"#surname#", user.Surname},
-                                                {"#SignupDate#", signup.Date.ToString("dddd d MMMM yyyy")},
-                                                {"#SlotDescription#", slot.Description},
-                                                {"#username#", user.Username},
-                                                {"#SignupDescription#", signup.Description},
-                                                {"#GroupDescription#", signup.Group.Name},
-                                                {"#sitename#", configurationService.SiteName()},
-                                                {"#siteurl#", configurationService.SiteURL()}
-                                            };
+
 
                         //  string key = "UserSessionCancel";
 
@@ -1138,6 +1127,18 @@ namespace eMotive.Managers.Objects
                                         key = reserveCancel ? "ReserveSessionCancel" : "InterviewerSessionCancel";
                                 }
                                 */
+                        var replacements = new Dictionary<string, string>(4)
+                                            {
+                                                {"#forename#", user.Forename},
+                                                {"#surname#", user.Surname},
+                                                {"#SignupDate#", signup.Date.ToString("dddd d MMMM yyyy")},
+                                                {"#SlotDescription#", slot.Description},
+                                                {"#username#", user.Username},
+                                                {"#SignupDescription#", signup.Description},
+                                                {"#GroupDescription#", signup.Group.Name},
+                                                {"#sitename#", configurationService.SiteName()},
+                                                {"#siteurl#", configurationService.SiteURL()}
+                                            };
 
                         var addresses = new Collection<string>();
 
@@ -1174,9 +1175,21 @@ namespace eMotive.Managers.Objects
 
                         if (BumpUser)
                         {
+                            replacements = new Dictionary<string, string>(4)
+                                            {
+                                                {"#forename#", user.Forename},
+                                                {"#surname#", user.Surname},
+                                                {"#SignupDate#", signup.Date.ToString("dddd d MMMM yyyy")},
+                                                {"#SlotDescription#", slot.Description},
+                                                {"#username#", user.Username},
+                                                {"#SignupDescription#", signup.Description},
+                                                {"#GroupDescription#", signup.Group.Name},
+                                                {"#sitename#", configurationService.SiteName()},
+                                                {"#siteurl#", configurationService.SiteURL()}
+                                            };
                             var users = slot.ApplicantsSignedUp.Select(n => n).OrderBy(n => n.SignupDate).ToArray();
 
-                            var userToBump = users[slot.TotalPlacesAvailable /*+ slot.ReservePlaces*/ /*+ 1*/].User;
+                            var userToBump = users[slot.TotalPlacesAvailable + slot.ReservePlaces/* + 1*/].User;
 
                             addresses = new Collection<string>();
 
@@ -1185,7 +1198,7 @@ namespace eMotive.Managers.Objects
 
                             if (userToBump.Roles.Any(n => n.Name == "SCE"))
                             {
-                                var scebumpdata = userManager.FetchSCEData(user.ID);
+                                var scebumpdata = userManager.FetchSCEData(userToBump.ID);
 
                                 if (scebumpdata != null)
                                 {

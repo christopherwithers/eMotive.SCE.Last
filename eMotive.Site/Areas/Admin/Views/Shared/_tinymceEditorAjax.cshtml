@@ -12,7 +12,7 @@
         toolbar: "insertfile undo redo | styleselect | fontsizeselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image | spellchecker",
             mode: "specific_textareas",
             editor_selector: "tinymce",
-            encoding: "xml",
+          //  encoding: "xml",
             forced_root_block: false,
             force_p_newlines: false,
             remove_linebreaks: false,
@@ -21,6 +21,10 @@
             verify_html: false,
             setup: function (editor)
             {
+                /*editor.on('LoadContent', function (e) {
+                    e.content = htmlEnDeCode.html(e.content);//.replace(/&#39/g, '&apos');
+                });*/
+
                 editor.on('SaveContent', function (e)
                 {
                     e.content = e.content.replace(/&#39/g, '&apos');
@@ -52,4 +56,63 @@
             }, { window: win, input: field_name });
             return false;
         };
+
+
+        var htmlEnDeCode = (function () {
+            var charToEntityRegex,
+                entityToCharRegex,
+                charToEntity,
+                entityToChar;
+
+            function resetCharacterEntities() {
+                charToEntity = {};
+                entityToChar = {};
+                // add the default set
+                addCharacterEntities({
+                    '&amp;': '&',
+                    '&gt;': '>',
+                    '&lt;': '<',
+                    '&quot;': '"',
+                    '&#39;': "'"
+                });
+            }
+
+            function addCharacterEntities(newEntities) {
+                var charKeys = [],
+                    entityKeys = [],
+                    key, echar;
+                for (key in newEntities) {
+                    echar = newEntities[key];
+                    entityToChar[key] = echar;
+                    charToEntity[echar] = key;
+                    charKeys.push(echar);
+                    entityKeys.push(key);
+                }
+                charToEntityRegex = new RegExp('(' + charKeys.join('|') + ')', 'g');
+                entityToCharRegex = new RegExp('(' + entityKeys.join('|') + '|&#[0-9]{1,5};' + ')', 'g');
+            }
+
+            function htmlEncode(value) {
+                var htmlEncodeReplaceFn = function (match, capture) {
+                    return charToEntity[capture];
+                };
+
+                return (!value) ? value : String(value).replace(charToEntityRegex, htmlEncodeReplaceFn);
+            }
+
+            function htmlDecode(value) {
+                var htmlDecodeReplaceFn = function (match, capture) {
+                    return (capture in entityToChar) ? entityToChar[capture] : String.fromCharCode(parseInt(capture.substr(2), 10));
+                };
+
+                return (!value) ? value : String(value).replace(entityToCharRegex, htmlDecodeReplaceFn);
+            }
+
+            resetCharacterEntities();
+
+            return {
+                htmlEncode: htmlEncode,
+                htmlDecode: htmlDecode
+            };
+        })();
     </script>

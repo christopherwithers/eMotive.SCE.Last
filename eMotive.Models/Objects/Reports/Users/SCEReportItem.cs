@@ -1,7 +1,10 @@
-﻿namespace eMotive.Models.Objects.Reports.Users
+﻿using System;
+
+namespace eMotive.Models.Objects.Reports.Users
 {
     public class SCEReportItem
     {
+        public int UserID { get; set; }
         public string Username { get; set; }
         public string Title { get; set; }
         public string Forename { get; set; }
@@ -24,5 +27,6 @@
         public bool Trained { get; set; }
         public bool Enabled { get; set; }
         public string Notes { get; set; }
+        public DateTime DateTrained { get; set; }
     }
 }
