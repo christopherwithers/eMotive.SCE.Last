@@ -56,9 +56,19 @@ namespace eMotive.Managers.Objects
                 return SlotStatus.Signup;
             }
 
-            if (!_params.MultipleSignupsPerSignup)
+         /*   if (!_params.MultipleSignupsPerSignup)
             {
                 if (_params.UserHasSignup)
+                    return SlotStatus.Clash;
+
+                return SlotStatus.Signup;
+            }*/
+            if (!_params.MultipleSignupsPerGroup)
+            {
+                //if (userIsSignnedUpToCurrentSignup)
+                  //  return SlotStatus.AlreadySignedUp;
+
+                if (_params.UserHasSignup && !_params.MultipleSignupsPerSignup)
                     return SlotStatus.Clash;
 
                 return SlotStatus.Signup;

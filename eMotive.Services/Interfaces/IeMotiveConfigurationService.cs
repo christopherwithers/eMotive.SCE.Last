@@ -26,5 +26,7 @@ namespace eMotive.Services.Interfaces
         Settings FetchSettings();
 
         string GetClientIpAddress();
+
+        string GetLoggedInUsername();
     }
 }

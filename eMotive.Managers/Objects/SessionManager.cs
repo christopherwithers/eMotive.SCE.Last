@@ -843,7 +843,7 @@ namespace eMotive.Managers.Objects
             var userSignUp = signupRepository.FetchUserSignups(user.ID, userProfile.Groups.Select(n => n.ID));
 
             var slotView = new UserSlotView(signup);
-
+            var isAdmin = user.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin" || n.Name == "UGC");
             foreach (var item in signup.Slots)
             {
                 var slot = new SlotState
@@ -855,7 +855,7 @@ namespace eMotive.Managers.Objects
                     TotalPlacesAvailable = item.TotalPlacesAvailable,
                     Status = GenerateSlotStatus(item, new GenerateSlotStatusDTO
                     {
-                        Closed = signup.Closed || signup.CloseDate < DateTime.Now,
+                        Closed = isAdmin ? false : signup.Closed || signup.CloseDate < DateTime.Now,//isAdmin ? false : signup.Closed || signup.CloseDate < DateTime.Now,
                         MergeReserve = signup.MergeReserve,
                         MultipleSignupsPerSignup = signup.AllowMultipleSignups,
                         MultipleSignupsPerGroup = signupGroup.AllowMultipleSignups,
@@ -867,7 +867,7 @@ namespace eMotive.Managers.Objects
                         SignupDate = signup.Date
                     }),
                     SignupType = GenerateUserSignupType(item, user.ID),
-                    Closed = signup.Closed || signup.CloseDate < DateTime.Now,
+                    Closed = isAdmin ? false : signup.Closed || signup.CloseDate < DateTime.Now,
                     OverrideClose = signup.OverrideClose,
                     MergeReserve = signup.MergeReserve,
                     TotalInterestedAvaiable = item.InterestedPlaces,
@@ -916,8 +916,8 @@ namespace eMotive.Managers.Objects
 
             //TODO: Check for null here?
             var user = userManager.Fetch(_username);
-            //  var profile = userManager.FetchProfile(_username);
-
+            var loggedInUser = userManager.Fetch(configurationService.GetLoggedInUsername());
+            var isAdmin = loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin");
 
             object bodyLock;
             lock (dictionaryLock)
@@ -930,7 +930,7 @@ namespace eMotive.Managers.Objects
                 }
             }
 
-            if (signup.Closed)
+            if (!isAdmin && signup.Closed)
             {
                 notificationService.AddIssue("You cannot sign up to this slot. The sign up is closed.");
 

@@ -28,7 +28,7 @@
 <script src="http://js.pusher.com/1.12/pusher.min.js" type="text/javascript"></script>
 <script type="text/javascript">
 
-
+    /*
     var pusher = new Pusher('16e704e82102cc97b901');
 
     /* pusher.connection.bind('error', function (err) {
@@ -37,22 +37,22 @@
          }
      });*/
 
-    var channel = pusher.subscribe('SignupSelection');
+  //  var channel = pusher.subscribe('SignupSelection');
 
-    channel.bind('PlacesChanged', function (data) {
-        var signup = data.SignUpId;
-        var totalPlacesAvailable = data.TotalPlaces;
-        var placesAvailable = data.PlacesAvailable;
+  //  channel.bind('PlacesChanged', function (data) {
+    //    var signup = data.SignUpId;
+     //   var totalPlacesAvailable = data.TotalPlaces;
+     //   var placesAvailable = data.PlacesAvailable;
         // alert(signupID);
-        $("#signup_value_" + signup).text(placesAvailable + " Places Available");
+    //    $("#signup_value_" + signup).text(placesAvailable + " Places Available");
 
         // if (signupID != undefined && signupID != signup) {
-        $("#signup_class_" + signup).attr("class", SetStatusStyle(totalPlacesAvailable, placesAvailable, false));
-        $("#signup_button_" + signup).attr("class", SetStatusStyle(totalPlacesAvailable, placesAvailable, true));
-        //  }
-    });
+    //    $("#signup_class_" + signup).attr("class", SetStatusStyle(totalPlacesAvailable, placesAvailable, false));
+    //    $("#signup_button_" + signup).attr("class", SetStatusStyle(totalPlacesAvailable, placesAvailable, true));
+        //  }*/
+   // });
 
-    function SetStatusStyle(totalplaces, remainingPlaces, button) {
+    /*function SetStatusStyle(totalplaces, remainingPlaces, button) {
         var placesLeft = (100 * remainingPlaces) / totalplaces;
 
         var warningLevel;
@@ -70,7 +70,7 @@
         }
 
         return warningLevel;
-    }
+    }*/
 </script>
 
 @if (Model.Signup == null || !Model.Signup.SignupInformation.HasContent())

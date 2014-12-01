@@ -1,4 +1,5 @@
 ﻿using System.Configuration;
+using System.Security.Claims;
 using System.Web;
 using eMotive.Services.Interfaces;
 using eMotive.Services.Objects.Settings;
@@ -95,6 +96,11 @@ namespace eMotive.Services
             }
 
             return ip;
+        }
+
+        public string GetLoggedInUsername()
+        {
+            return !HttpContext.Current.User.Identity.IsAuthenticated ? string.Empty : ((ClaimsIdentity)HttpContext.Current.User.Identity).Name;
         }
     }
 }

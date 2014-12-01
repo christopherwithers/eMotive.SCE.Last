@@ -804,7 +804,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                     worksheet.Cells[x, 3].Value = "Location";
                     worksheet.Cells[x, 4].Value = "Slot";
                     worksheet.Cells[x, 5].Value = "Place";
-                    worksheet.Cells[x, 6].Value = "Happy To Move";
+                    worksheet.Cells[x, 6].Value = "Not Happy To Move";
                     worksheet.Cells[x, 7].Value = "Date Signed Up";
                     worksheet.Cells[x, 8].Value = "Username";
                     worksheet.Cells[x, 9].Value = "Title";
@@ -884,7 +884,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                                     worksheet.Cells[x, 18].Value = sceData.PhoneWork;
                                     worksheet.Cells[x, 19].Value = sceData.PhoneMobile;
                                     worksheet.Cells[x, 20].Value = sceData.PhoneOther;
-                                    worksheet.Cells[x, 21].Value = sceData.DateTrained != default(DateTime) ? (sceData.DateTrained > DateTime.Now.AddYears(-3) ? "Yes" : "No") : string.Empty;
+                                    worksheet.Cells[x, 21].Value = sceData.Trained ? "Yes" : "No";
                                     worksheet.Cells[x, 22].Value = sceData.DateTrained.ToString("D");
 
                                     if (loggedInUser != null && loggedInUser.Roles.Any(n => n.Name == "Admin" || n.Name == "Super Admin"))

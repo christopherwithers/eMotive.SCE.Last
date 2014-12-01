@@ -325,7 +325,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin, UGC")]
         public ActionResult EditSCE(string username)
         {
             var user = userManager.Fetch(username);
@@ -350,7 +350,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
+        [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin, UGC")]
         public ActionResult EditSCE(SCEData sce)
         {
             if (ModelState.IsValid)

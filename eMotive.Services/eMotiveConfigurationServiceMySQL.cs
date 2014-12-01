@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using System.Security.Claims;
 using System.Transactions;
 using System.Web;
 using Dapper;
@@ -188,6 +189,11 @@ namespace eMotive.Services
             }
 
             return ip;
+        }
+
+        public string GetLoggedInUsername()
+        {
+            return !HttpContext.Current.User.Identity.IsAuthenticated ? string.Empty : ((ClaimsIdentity)HttpContext.Current.User.Identity).Name;
         }
     }
 }

@@ -99,7 +99,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                         Links = new[]
                             {
                                 new SuccessView.Link {Text = string.Format("Return to Edit '{0}' partial page", page.Key), URL = Request.Url == null ? string.Empty : Request.Url.AbsoluteUri},
-                                new SuccessView.Link {Text = "Return to pages Home", URL = "/MMI/Admin/Pages"}
+                                new SuccessView.Link {Text = "Return to pages Home", URL = @Url.Action("Index", "Pages")}
 
                             }
                     };
