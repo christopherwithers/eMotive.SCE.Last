@@ -39,6 +39,10 @@
                 if (NumberSignedUp < TotalPlacesAvailable + TotalReserveAvailable)
                     return string.Format("{1} {0} Available", "RESERVE".SingularOrPlural(TotalPlacesAvailable +TotalReserveAvailable - NumberSignedUp), TotalPlacesAvailable + TotalReserveAvailable - NumberSignedUp);
 
+                placesAvailable = TotalPlacesAvailable + TotalReserveAvailable + TotalInterestedAvaiable - NumberSignedUp;
+                if (NumberSignedUp < TotalPlacesAvailable + TotalReserveAvailable + TotalInterestedAvaiable)
+                    return string.Format("{1} {0} Available", "INTERESTED", placesAvailable);
+
             }
             else
             {

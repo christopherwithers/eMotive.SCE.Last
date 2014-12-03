@@ -196,9 +196,14 @@
             </div>
         </div><div class="control-group">
             <label class="control-label" for="Notes">Notes</label>
-            <div class="controls">
-                @Html.TextAreaFor(m => m.Notes)
-            </div>
+                  <div class="controls">
+                      <textarea cols="20" id="Notes" name="Notes" rows="2">
+                          @Html.Raw(Server.HtmlDecode(Model.Notes))
+                      </textarea>
+
+                      
+
+                  </div>                      
         </div>
 
 

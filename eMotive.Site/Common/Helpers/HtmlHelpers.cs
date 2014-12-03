@@ -66,15 +66,15 @@ namespace eMotive.SCE.Common.Helpers
                 case SlotStatus.AlreadySignedUp:
                     return MvcHtmlString.Create(string.Format(" onclick='DoCancelSignup({0},{1});' ", _signupId, _slotId));
                 case SlotStatus.Clash:
-                    return MvcHtmlString.Create(" onclick='ShowClashModal();' ");
+                    return MvcHtmlString.Create("  ");
                 /*       case SlotStatus.AlreadySignedUpClosed:
                            return MvcHtmlString.Create(" onclick='ShowClosedSignedupModal();' ");
                        case SlotStatus.Closed:
                            return MvcHtmlString.Create(" onclick='ShowClosedModal();' ");*/
                 case SlotStatus.Closed:
-                    return MvcHtmlString.Create(" onclick='ShowDateClosedModal();' ");
+                    return MvcHtmlString.Create("  ");
                 case SlotStatus.Full:
-                    return MvcHtmlString.Create(" onclick='ShowFullModal();' ");
+                    return MvcHtmlString.Create("  ");
                 case SlotStatus.Signup:
                 case SlotStatus.Reserve:
                 case SlotStatus.Interested:
@@ -92,15 +92,15 @@ namespace eMotive.SCE.Common.Helpers
                 case SlotStatus.AlreadySignedUp:
                     return MvcHtmlString.Create(string.Format(" onclick='DoCancelSignup({0},{1},\"{2}\");' ", _signupId, _slotId, _username));
                 case SlotStatus.Clash:
-                    return MvcHtmlString.Create(" onclick='ShowClashModal();' ");
+                    return MvcHtmlString.Create(" ");
                 /*       case SlotStatus.AlreadySignedUpClosed:
                            return MvcHtmlString.Create(" onclick='ShowClosedSignedupModal();' ");
                        case SlotStatus.Closed:
                            return MvcHtmlString.Create(" onclick='ShowClosedModal();' ");*/
                 case SlotStatus.Closed:
-                    return MvcHtmlString.Create(" onclick='ShowDateClosedModal();' ");
+                    return MvcHtmlString.Create("  ");
                 case SlotStatus.Full:
-                    return MvcHtmlString.Create(" onclick='ShowFullModal();' ");
+                    return MvcHtmlString.Create(" ");
                 case SlotStatus.Signup:
                 case SlotStatus.Reserve:
                 case SlotStatus.Interested:

@@ -1,4 +1,6 @@
-﻿@using Extensions
+﻿@using System.Linq
+@using eMotive.Models.Objects
+@using Extensions
 @using eMotive.SCE.Common.Helpers
 @using eMotive.Models.Objects.Signups
 
@@ -107,6 +109,10 @@ else
                                     @if (signup.SignedUp)
                                     {
                                         <span class="label label-success">Signed Up</span>
+                                        foreach (var type in signup.SignupTypes.Where(n => n == SlotType.Interested))
+                                        {
+                                            <span class="label label-success">@type</span>
+                                        }
                                     }
                                     else
                                     {
@@ -114,6 +120,7 @@ else
 
                                     }
                                 </td>
+
                                 <td>@signup.Date.ToString("dddd d MMMM yyyy")</td>
                                 <td>@signup.Description</td>
 

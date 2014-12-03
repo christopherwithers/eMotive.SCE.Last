@@ -51,7 +51,7 @@ namespace eMotive.Managers.Objects
         readonly Dictionary<int, object> dictionary = new Dictionary<int, object>();
         readonly object dictionaryLock = new object();
 
-        private IEnumerable<Repository.Objects.Signups.Signup> FetchSignupsByGroup(IEnumerable<int> _groups)
+        /*private IEnumerable<Repository.Objects.Signups.Signup> FetchSignupsByGroup(IEnumerable<int> _groups)
         {
             var cacheId = string.Format("RepSignups_{0}", string.Join("_", _groups));
 
@@ -65,6 +65,59 @@ namespace eMotive.Managers.Objects
             cache.PutCollection(signups, n => n.id, cacheId);
 
             return signups;
+        }*/
+
+        private IEnumerable<Signup> FetchSignupsByGroup(IEnumerable<int> _groups)
+        {
+ 
+           // signups = 
+
+           // var cacheId = "ModelSignupCollection";
+
+           // var signupModels = cache.FetchCollection<Signup>(cacheId, i => i.ID, null);//TODO: need a fetch (ids) func to push in here?
+
+           // if (signupModels.HasContent())
+           //     return signupModels;
+
+            var signups = signupRepository.FetchSignupsByGroup(_groups);
+
+            if (!signups.HasContent())
+                return null;
+
+            var signupModels = Mapper.Map<IEnumerable<rep.Signup>, IEnumerable<Signup>>(signups);
+
+            var usersDict = userManager.Fetch(signups.SelectMany(u => u.Slots.Where(n => n.UsersSignedUp.HasContent()).SelectMany(n => n.UsersSignedUp).Select(m => m.IdUser))).ToDictionary(k => k.ID, v => v);
+
+            var locationDict = formManager.FetchFormList("Sites")
+                .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
+
+            foreach (var repSignup in signups)
+            {
+                foreach (var modSignup in signupModels)
+                {
+                    if (repSignup.id == modSignup.ID)
+                        modSignup.Location = locationDict[repSignup.idSite.ToString(CultureInfo.InvariantCulture)];
+                    foreach (var repSlot in repSignup.Slots)
+                    {
+                        foreach (var slot in modSignup.Slots)
+                        {
+                            if (repSlot.id != slot.ID) continue;
+
+                            if (!repSlot.UsersSignedUp.HasContent()) continue;
+
+                            slot.ApplicantsSignedUp = new Collection<UserSignup>();
+                            foreach (var user in repSlot.UsersSignedUp)
+                            {
+                                slot.ApplicantsSignedUp.Add(new UserSignup { User = usersDict[user.IdUser], SignupDate = user.SignUpDate, ID = user.ID });
+                            }
+                        }
+                    }
+                }
+            }
+
+            //cache.PutCollection(signupModels, i => i.ID, cacheId);
+
+            return signupModels;
         }
 
         //todo: closed date logic here
@@ -367,23 +420,23 @@ namespace eMotive.Managers.Objects
 
                 foreach (var slot in signup.Slots)
                 {
-                    if (!slot.UsersSignedUp.HasContent())
+                    if (!slot.ApplicantsSignedUp.HasContent())
                         continue;
 
-                    foreach (var userSignup in slot.UsersSignedUp)
+                    foreach (var userSignup in slot.ApplicantsSignedUp)
                     {
-                        if (userSignup.IdUser != user.ID) continue;
+                        if (userSignup.User.ID != user.ID) continue;
 
                         var signupDetails = new UserSignupDetails
                         {
                             SignUpDate = signup.Date.AddHours(slot.Time.Hour).AddMinutes(slot.Time.Minute),
                             SignUpDetails = slot.Description,
-                            SignedUpSlotID = slot.id,
-                            SignupID = signup.id,
-                            Location = locationDict[signup.idSite.ToString(CultureInfo.InvariantCulture)],
+                            SignedUpSlotID = slot.ID,
+                            SignupID = signup.ID,
+                            Location = signup.Location,//locationDict[signup.idSite.ToString(CultureInfo.InvariantCulture)],
                             SignupGroup = new Group { Description = signup.Group.Description, AllowMultipleSignups = signup.Group.AllowMultipleSignups, ID = signup.Group.ID, Name = signup.Group.Name, AllowSelfSignup = signup.Group.AllowSelfSignup },
                             SignupDescription = signup.Description,
-                            Type = GenerateHomeViewSlotStatus(slot, user.ID)// slot.UsersSignedUp.Where(n => n.IdUser == user.ID).Single(t => t.Type)
+                            Type = GenerateUserSignupType(slot, user.ID)// slot.UsersSignedUp.Where(n => n.IdUser == user.ID).Single(t => t.Type)
                         };
 
                         homeView.SignupDetails.Add(signupDetails);
@@ -418,50 +471,50 @@ namespace eMotive.Managers.Objects
             int signupId = 0;
             if (signups.HasContent())
             {
-                var locationDict = formManager.FetchFormList("Sites")
-                    .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
+              //  var locationDict = formManager.FetchFormList("Sites")
+               //     .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
                 //signupCollection
                 foreach (var item in signups)
                 {
                     //Logic to deal with applicants and closed signups
                     //if a signup is closed, we hide it from applicants UNLESS they are signed up to a slot in that signup
-                    if (!item.Closed || userSignUp != null && userSignUp.Any(n => n.IdSignUp == item.id))
+                    if (!item.Closed || userSignUp != null && userSignUp.Any(n => n.IdSignUp == item.ID))
                     {
                         var signup = new SignupState
                         {
-                            ID = item.id,
+                            ID = item.ID,
                             Date = item.Date,
                             SignedUp =
                                 item.Slots.Any(
                                     n =>
-                                    n.UsersSignedUp.HasContent() &&
-                                    n.UsersSignedUp.Any(m => m != null && m.IdUser == user.ID)),
-                            TotalSlotsAvailable = item.Slots.Sum(n => n.PlacesAvailable),
+                                    n.ApplicantsSignedUp.HasContent() &&
+                                    n.ApplicantsSignedUp.Any(m => m != null && m.User.ID == user.ID)),
+                            TotalSlotsAvailable = item.Slots.Sum(n => n.TotalPlacesAvailable),
                             TotalReserveAvailable = item.Slots.Sum(n => n.ReservePlaces),
                             TotalInterestedAvaiable = item.Slots.Sum(n => n.InterestedPlaces),
 
-                            NumberSignedUp = item.Slots.Sum(n => n.UsersSignedUp.HasContent() ? n.UsersSignedUp.Count() : 0),
+                            NumberSignedUp = item.Slots.Sum(n => n.ApplicantsSignedUp.HasContent() ? n.ApplicantsSignedUp.Count() : 0),
 
                             MergeReserve = item.MergeReserve,
                             OverrideClose = item.OverrideClose,
-                            DisabilitySignup = item.Group.DisabilitySignups,
+                        //    DisabilitySignup = item.Group.,
                             Closed = item.Closed || item.CloseDate < DateTime.Now,
                             Description = item.Description,
                             //       SignupType = item.
                             Group = new Group { AllowMultipleSignups = item.Group.AllowMultipleSignups, Description = item.Group.Description, ID = item.Group.ID, Name = item.Group.Name },
-                            Location = locationDict[item.idSite.ToString(CultureInfo.InvariantCulture)]
+                            Location = item.Location //locationDict[item.idSite.ToString(CultureInfo.InvariantCulture)]
                         };
 
 
-                        foreach (var slot in item.Slots ?? new rep.Slot[] { })
+                        foreach (var slot in item.Slots ?? new Slot[] { })
                         {
                             signup.SignupNumbers.Add(new SignupState.SignupSlotState
                             {
-                                SlotID = slot.id,
-                                TotalSlotsAvailable = slot.PlacesAvailable,
+                                SlotID = slot.ID,
+                                TotalSlotsAvailable = slot.TotalPlacesAvailable,
                                 TotalInterestedAvaiable = slot.InterestedPlaces,
                                 TotalReserveAvailable = slot.ReservePlaces,
-                                NumberSignedUp = slot.UsersSignedUp.HasContent() ? slot.UsersSignedUp.Count : 0
+                                NumberSignedUp = slot.ApplicantsSignedUp.HasContent() ? slot.ApplicantsSignedUp.Count : 0
                             });
                         }
 
@@ -474,7 +527,7 @@ namespace eMotive.Managers.Objects
 
                             foreach (var userSignup in item.Slots)
                             {
-                                if (userSignup.UsersSignedUp.HasContent() && userSignup.UsersSignedUp.Any(n => n.IdUser == user.ID))
+                                if (userSignup.ApplicantsSignedUp.HasContent() && userSignup.ApplicantsSignedUp.Any(n => n.User.ID == user.ID))
                                 {
                                     //   var usersIndex = userSignup.UsersSignedUp.FindIndex(n => n.IdUser == user.ID);
 
@@ -484,7 +537,7 @@ namespace eMotive.Managers.Objects
 
 
 
-                                    signup.SignupTypes.Add(GenerateHomeViewSlotStatus(userSignup, user.ID));//usersIndex.ToString());
+                                    signup.SignupTypes.Add(GenerateUserSignupType(userSignup, user.ID));//usersIndex.ToString());
                                     // }
                                 }
                             }
@@ -533,35 +586,35 @@ namespace eMotive.Managers.Objects
 
             if (signups.HasContent())
             {
-                var locationDict = formManager.FetchFormList("Sites")
-                    .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
+             //   var locationDict = formManager.FetchFormList("Sites")
+                //    .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
                 //signupCollection
                 foreach (var item in signups)
                 {
                     //Logic to deal with applicants and closed signups
                     //if a signup is closed, we hide it from applicants UNLESS they are signed up to a slot in that signup
-                    if (!item.Closed || userSignUp != null && userSignUp.Any(n => n.IdSignUp == item.id))
+                    if (!item.Closed || userSignUp != null && userSignUp.Any(n => n.IdSignUp == item.ID))
                     {
                         var signup = new SignupState
                         {
-                            ID = item.id,
+                            ID = item.ID,
                             Date = item.Date,
                             SignedUp =
                                 item.Slots.Any(
                                     n =>
-                                    n.UsersSignedUp.HasContent() &&
-                                    n.UsersSignedUp.Any(m => m != null && m.IdUser == user.ID)),
-                            TotalSlotsAvailable = item.Slots.Sum(n => n.PlacesAvailable),
+                                    n.ApplicantsSignedUp.HasContent() &&
+                                    n.ApplicantsSignedUp.Any(m => m != null && m.User.ID == user.ID)),
+                            TotalSlotsAvailable = item.Slots.Sum(n => n.TotalPlacesAvailable),
                             TotalReserveAvailable = item.Slots.Sum(n => n.ReservePlaces),
                             TotalInterestedAvaiable = item.Slots.Sum(n => n.InterestedPlaces),
-                            NumberSignedUp = item.Slots.Sum(n => n.UsersSignedUp.HasContent() ? n.UsersSignedUp.Count() : 0),
+                            NumberSignedUp = item.Slots.Sum(n => n.ApplicantsSignedUp.HasContent() ? n.ApplicantsSignedUp.Count() : 0),
                             MergeReserve = item.MergeReserve,
                             OverrideClose = item.OverrideClose,
-                            DisabilitySignup = item.Group.DisabilitySignups,
+                        //    DisabilitySignup = item.Group.DisabilitySignups,
                             Closed = item.Closed || item.CloseDate < DateTime.Now,
                             Description = item.Description,
                             Group = new Group { AllowMultipleSignups = item.Group.AllowMultipleSignups, Description = item.Group.Description, ID = item.Group.ID, Name = item.Group.Name },
-                            Location = locationDict[item.idSite.ToString(CultureInfo.InvariantCulture)]
+                            Location = item.Location//locationDict[item.idSite.ToString(CultureInfo.InvariantCulture)]
                         };
 
                         if (signup.SignedUp)
@@ -606,33 +659,33 @@ namespace eMotive.Managers.Objects
 
             if (signups.HasContent())
             {
-                var locationDict = formManager.FetchFormList("Sites")
-                    .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
+             //   var locationDict = formManager.FetchFormList("Sites")
+                  //  .Collection.ToDictionary(k => k.Value, v => new Location { ID = v.Value, Name = v.Text });
                 //signupCollection
                 foreach (var item in signups)
                 {
                     //Logic to deal with applicants and closed signups
                     //if a signup is closed, we hide it from applicants UNLESS they are signed up to a slot in that signup
-                    if (!item.Closed || userSignUp != null && userSignUp.IdSignUp == item.id)
+                    if (!item.Closed || userSignUp != null && userSignUp.IdSignUp == item.ID)
                     {
                         var signup = new SignupState
                         {
-                            ID = item.id,
+                            ID = item.ID,
                             Date = item.Date,
                             SignedUp =
                                 item.Slots.Any(
                                     n =>
-                                    n.UsersSignedUp.HasContent() &&
-                                    n.UsersSignedUp.Any(m => m != null && m.IdUser == user.ID)),
-                            TotalSlotsAvailable = item.Slots.Sum(n => n.PlacesAvailable),
+                                    n.ApplicantsSignedUp.HasContent() &&
+                                    n.ApplicantsSignedUp.Any(m => m != null && m.User.ID == user.ID)),
+                            TotalSlotsAvailable = item.Slots.Sum(n => n.TotalPlacesAvailable),
                             TotalReserveAvailable = item.Slots.Sum(n => n.ReservePlaces),
                             TotalInterestedAvaiable = item.Slots.Sum(n => n.InterestedPlaces),
-                            NumberSignedUp = item.Slots.Sum(n => n.UsersSignedUp.HasContent() ? n.UsersSignedUp.Count() : 0),
+                            NumberSignedUp = item.Slots.Sum(n => n.ApplicantsSignedUp.HasContent() ? n.ApplicantsSignedUp.Count() : 0),
                             MergeReserve = item.MergeReserve,
                             OverrideClose = item.OverrideClose,
-                            DisabilitySignup = item.Group.DisabilitySignups,
+                         //   DisabilitySignup = item.Group.DisabilitySignups,
                             Closed = item.Closed || item.CloseDate < DateTime.Now,
-                            Location = locationDict[item.idSite.ToString(CultureInfo.InvariantCulture)]
+                            Location = item.Location//locationDict[item.idSite.ToString(CultureInfo.InvariantCulture)]
                         };
 
                         if (signup.SignedUp)
@@ -723,6 +776,11 @@ namespace eMotive.Managers.Objects
             var userSignedUpToSlot = slot.ApplicantsSignedUp.HasContent() && slot.ApplicantsSignedUp.Any(n => String.Equals(n.User.Username, _user.Username, StringComparison.CurrentCultureIgnoreCase));
             var userSignedUpToAnySlot = _signup.Slots.Any(n => n.ApplicantsSignedUp.HasContent() && n.ApplicantsSignedUp.Any(m => String.Equals(m.User.Username, _user.Username, StringComparison.CurrentCultureIgnoreCase)));
 
+            var signedUpToOtherSitesOnDate = _signups.Any(n => n.Date == _signup.Date && n.idSite != Convert.ToInt32(_signup.Location.ID));
+
+            
+
+
             if (userSignedUpToSlot)
                 return SlotStatus.AlreadySignedUp;
 
@@ -736,6 +794,10 @@ namespace eMotive.Managers.Objects
                     return SlotStatus.Clash;
                 }
             }
+
+            if (signedUpToOtherSitesOnDate)
+                return SlotStatus.Clash;
+
 
             var applicantsSignedUp = slot.ApplicantsSignedUp.HasContent() ? slot.ApplicantsSignedUp.Count() : 0;
 
@@ -854,7 +916,7 @@ namespace eMotive.Managers.Objects
                     {
 
                         //+1 to account for the signup we are currently processing
-                        var SCEInterestedSignup = slot.ApplicantsSignedUp.HasContent() && slot.ApplicantsSignedUp.Count() >
+                        var SCEInterestedSignup = slot.ApplicantsSignedUp.HasContent() && slot.ApplicantsSignedUp.Count() >=
                                              slot.ReservePlaces + slot.TotalPlacesAvailable;
                         // slot.ApplicantsSignedUp.Single(n => n.ID == 0).ID = id;
                         var replacements = new Dictionary<string, string>(4)
@@ -1151,6 +1213,7 @@ namespace eMotive.Managers.Objects
 
             return (SlotType)userSignup.Type;
         }
+
 
         virtual public SlotType GenerateUserSignupType(Slot _slot, int _userId)
         {
