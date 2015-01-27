@@ -47,11 +47,10 @@ namespace eMotive.Models.Objects.Signups
             if (!MergeReserve)
             {
                 var inMain = false;
-              //  var inReserve = false;
 
                 var totalMainRemaining = 0;
                 var totalReserveRemaining = 0;
-
+                
                 foreach (var slot in SignupNumbers)
                 {
 
@@ -65,19 +64,10 @@ namespace eMotive.Models.Objects.Signups
                     {
                         totalReserveRemaining += (slot.TotalSlotsAvailable + slot.TotalReserveAvailable) - slot.NumberSignedUp;
                     }
-                    // if (slot.NumberSignedUp < slot.TotalSlotsAvailable)
-                    // {
-                    //    inMain = true;
-                    // break;
-                    // inReserve &= true;
-                    // }
                 }
 
                 if (totalMainRemaining > 0)
                 {
-
-                   // totalMainRemaining = SignupNumbers.Sum(n => n.TotalSlotsAvailable - n.NumberSignedUp);
-                   // totalReserveRemaining = SignupNumbers.Sum(n => n.TotalReserveAvailable);
 
                     return string.Format("{1} {0} Available ({2} Main, {3} Reserve)",
                         "PLACE".SingularOrPlural(TotalSlotsAvailable + TotalReserveAvailable - NumberSignedUp),
@@ -86,47 +76,36 @@ namespace eMotive.Models.Objects.Signups
                         totalReserveRemaining);
                 }
 
-               // totalMainRemaining = SignupNumbers.Sum(n => n.TotalSlotsAvailable - n.NumberSignedUp);
+
                 totalReserveRemaining = SignupNumbers.Sum(n => n.TotalReserveAvailable + n.TotalSlotsAvailable - n.NumberSignedUp);
 
                 return string.Format("{1} {0} Available",
                     "RESERVE".SingularOrPlural(totalReserveRemaining - NumberSignedUp),
                     totalReserveRemaining);
 
-              //  if (inReserve)
-               // {
-               //     
-               // }
-
                 return string.Format("{1} {0} Available", "Place".SingularOrPlural(TotalSlotsAvailable + TotalReserveAvailable - NumberSignedUp), TotalSlotsAvailable + TotalReserveAvailable - NumberSignedUp);
 
-             //   if (NumberSignedUp < TotalSlotsAvailable + TotalReserveAvailable)
-              //  var availabilityDetails = string.Empty;
-
-              //  if(NumberSignedUp > TotalSlotsAvailable)
-               //     availabilityDetails = string.Format(" ({0} Reserve) ", TotalSlotsAvailable + TotalReserveAvailable - NumberSignedUp);
-               // else
-                  //  availabilityDetails = string.Format(" ({0} Main, {1} Reserve) ", TotalSlotsAvailable - NumberSignedUp, TotalReserveAvailable);
-
-               // return string.Format("{1} {2} {0} Available", "Place".SingularOrPlural(TotalSlotsAvailable + TotalReserveAvailable - NumberSignedUp), TotalSlotsAvailable + TotalReserveAvailable - NumberSignedUp, availabilityDetails);
-
-                //if (NumberSignedUp < TotalSlotsAvailable + TotalReserveAvailable)
-               //     return string.Format("{1} {0} Available", "Reserve".SingularOrPlural(TotalSlotsAvailable - NumberSignedUp - TotalReserveAvailable), TotalSlotsAvailable + TotalReserveAvailable - NumberSignedUp);
 
             }
-            else
+
+            var AnyMainMerge = SignupNumbers.Any(n => n.NumberSignedUp < n.TotalSlotsAvailable + n.TotalReserveAvailable);
+
+
+            if (AnyMainMerge)
             {
-                if (NumberSignedUp < TotalSlotsAvailable + TotalReserveAvailable)
-                {
-                    placesAvailable = TotalSlotsAvailable + TotalReserveAvailable - NumberSignedUp;
-                    return string.Format("{1} {0} Available", "PLACE".SingularOrPlural(placesAvailable), placesAvailable);
-                }
+                var slotsToUse = SignupNumbers.Where(n => n.NumberSignedUp < n.TotalSlotsAvailable + n.TotalReserveAvailable);
+
+                var places = slotsToUse.Sum(n => (n.TotalSlotsAvailable + n.TotalReserveAvailable) - n.NumberSignedUp);
+
+                return string.Format("{1} {0} Available", "PLACE".SingularOrPlural(places), places);
             }
 
-            if (NumberSignedUp < TotalSlotsAvailable + TotalReserveAvailable + TotalInterestedAvaiable)
+            
+            var intPlaces = SignupNumbers.Sum(n => (n.TotalSlotsAvailable + n.TotalInterestedAvaiable + n.TotalReserveAvailable) - n.NumberSignedUp);
+
+            if(intPlaces > 0)
             {
-                placesAvailable = TotalSlotsAvailable + TotalReserveAvailable + TotalInterestedAvaiable - NumberSignedUp;
-                return string.Format("{1} {0} Available", "INTERESTED", placesAvailable);
+                return string.Format("{1} {0} Available", "INTERESTED", intPlaces);
             }
 
             return "No Places Available";

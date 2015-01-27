@@ -277,7 +277,7 @@ namespace eMotive.SCE.Controllers
             sceDetails.Forename = sceDetails.Forename ?? loggedInuser.Forename;
             sceDetails.Surname = sceDetails.Surname ?? loggedInuser.Surname;
             sceDetails.Email = sceDetails.Email ?? loggedInuser.Email;
-
+            sceDetails.Enabled = loggedInuser.Enabled;
             var allGroups = groupManager.FetchGroups();
             var dropDowns = new SCEFormData();
 

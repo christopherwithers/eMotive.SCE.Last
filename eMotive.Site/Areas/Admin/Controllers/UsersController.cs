@@ -132,7 +132,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
 
         public CustomJsonResult SessionAttendanceCertificate(string username)
         {
-            var pdf = new ActionAsPdf("SessionAttendanceCertificateLayout", new { username = username}) { FileName = "Certificate.pdf" };
+            var pdf = new ActionAsPdf("SessionAttendanceCertificateTrainingLayout", new { username = username }) { FileName = "Certificate.pdf" };
 
             bool emailSent = false;
 
@@ -171,7 +171,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
         }
 
        // [Common.ActionFilters.Authorize(Roles = "Super Admin, Admin")]
-        public ActionResult SessionAttendanceCertificateLayout(string username)
+        public ActionResult SessionAttendanceCertificateTrainingLayout(string username)
         {
             var user = userManager.Fetch(username);
 

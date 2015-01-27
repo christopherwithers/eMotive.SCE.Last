@@ -46,17 +46,27 @@ namespace eMotive.Managers.Objects.Search
             field = new Field("Type", Type, Field.Store.YES, Field.Index.ANALYZED);
             doc.Add(field);
 
-            field = new Field("Username", User.Username, Field.Store.YES, Field.Index.ANALYZED);
-            doc.Add(field);
+            if (!string.IsNullOrEmpty(User.Username))
+            {
+                field = new Field("Username", User.Username, Field.Store.YES, Field.Index.ANALYZED);
+                doc.Add(field);
+            }
+            if (!string.IsNullOrEmpty(User.Forename))
+            {
+                field = new Field("Forename", User.Forename, Field.Store.NO, Field.Index.ANALYZED);
+                doc.Add(field);
+            }
+            if (!string.IsNullOrEmpty(User.Surname))
+            {
+                field = new Field("Surname", User.Surname, Field.Store.NO, Field.Index.ANALYZED);
+                doc.Add(field);
+            }
 
-            field = new Field("Forename", User.Forename, Field.Store.NO, Field.Index.ANALYZED);
-            doc.Add(field);
-
-            field = new Field("Surname", User.Surname, Field.Store.NO, Field.Index.ANALYZED);
-            doc.Add(field);
-
-            field = new Field("Email", User.Email, Field.Store.NO, Field.Index.ANALYZED);
-            doc.Add(field);
+            if (!string.IsNullOrEmpty(User.Email))
+            {
+                field = new Field("Email", User.Email, Field.Store.NO, Field.Index.ANALYZED);
+                doc.Add(field);
+            }
 
             if (User.Roles.HasContent())
             {

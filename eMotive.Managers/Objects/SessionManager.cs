@@ -777,7 +777,7 @@ namespace eMotive.Managers.Objects
             var userSignedUpToAnySlot = _signup.Slots.Any(n => n.ApplicantsSignedUp.HasContent() && n.ApplicantsSignedUp.Any(m => String.Equals(m.User.Username, _user.Username, StringComparison.CurrentCultureIgnoreCase)));
 
             var signedUpToOtherSitesOnDate = _signups.Any(n => n.Date == _signup.Date && n.idSite != Convert.ToInt32(_signup.Location.ID));
-
+            var signedUpToOtherGroupOnDate = _signups.Any(n => n.Date == _signup.Date && n.Group.ID != _signup.Group.ID);
             
 
 
@@ -796,6 +796,10 @@ namespace eMotive.Managers.Objects
             }
 
             if (signedUpToOtherSitesOnDate)
+                return SlotStatus.Clash;
+
+
+            if (signedUpToOtherGroupOnDate)
                 return SlotStatus.Clash;
 
 

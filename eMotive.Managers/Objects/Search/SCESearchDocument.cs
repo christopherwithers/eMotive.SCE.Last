@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using Extensions;
 using Lucene.Net.Documents;
 using eMotive.Repository.Objects.Users;
@@ -45,20 +46,30 @@ namespace eMotive.Managers.Objects.Search
 
             field = new Field("Type", Type, Field.Store.YES, Field.Index.ANALYZED);
             doc.Add(field);
+            if (!string.IsNullOrEmpty(User.Username))
+            {
+                field = new Field("Username", User.Username, Field.Store.YES, Field.Index.ANALYZED);
+                doc.Add(field);
+            }
 
-            field = new Field("Username", User.Username, Field.Store.YES, Field.Index.ANALYZED);
-            doc.Add(field);
+            if (!string.IsNullOrEmpty(User.Forename))
+            {
+                field = new Field("Forename", User.Forename, Field.Store.NO, Field.Index.ANALYZED);
+                doc.Add(field);
+            }
 
-            field = new Field("Forename", User.Forename, Field.Store.NO, Field.Index.ANALYZED);
-            doc.Add(field);
+            if (!string.IsNullOrEmpty(User.Surname))
+            {
+                field = new Field("Surname", User.Surname, Field.Store.NO, Field.Index.ANALYZED);
+                doc.Add(field);
+            }
 
-            field = new Field("Surname", User.Surname, Field.Store.NO, Field.Index.ANALYZED);
-            doc.Add(field);
-
-            field = new Field("Email", User.Email, Field.Store.NO, Field.Index.ANALYZED);
-            doc.Add(field);
-
-          //  if (User.Roles.HasContent())
+            if (!string.IsNullOrEmpty(User.Email))
+            {
+                field = new Field("Email", User.Email, Field.Store.NO, Field.Index.ANALYZED);
+                doc.Add(field);
+            }
+            //  if (User.Roles.HasContent())
            // {
              //   foreach (var role in User.Roles)
              //   {
@@ -75,20 +86,32 @@ namespace eMotive.Managers.Objects.Search
             field = new Field("Archived", User.Archived.ToString(), Field.Store.NO, Field.Index.ANALYZED);
             doc.Add(field);
 
-            field = new Field("Trust", User.Trust, Field.Store.NO, Field.Index.ANALYZED);
-            doc.Add(field);
+            if (!string.IsNullOrEmpty(User.Trust))
+            {
+                field = new Field("Trust", User.Trust, Field.Store.NO, Field.Index.ANALYZED);
+                doc.Add(field);
+            }
 
-            field = new Field("Grade", User.Grade, Field.Store.NO, Field.Index.ANALYZED);
-            doc.Add(field);
+            if (!string.IsNullOrEmpty(User.Grade))
+            {
+                field = new Field("Grade", User.Grade, Field.Store.NO, Field.Index.ANALYZED);
+                doc.Add(field);
+            }
 
-            field = new Field("MainSpecialty", User.MainSpecialty.ToString(), Field.Store.NO, Field.Index.ANALYZED);
-            doc.Add(field);
+            //if (!string.IsNullOrEmpty(User.MainSpecialty))
+           // {
+                field = new Field("MainSpecialty", User.MainSpecialty.ToString(CultureInfo.InvariantCulture), Field.Store.NO, Field.Index.ANALYZED);
+                doc.Add(field);
+           // }
 
             field = new Field("Trained", User.Trained.ToString(), Field.Store.NO, Field.Index.ANALYZED);
             doc.Add(field);
 
-            field = new Field("GMCNumber", User.GMCNumber, Field.Store.NO, Field.Index.ANALYZED);
-            doc.Add(field);
+            if (!string.IsNullOrEmpty(User.GMCNumber))
+            {
+                field = new Field("GMCNumber", User.GMCNumber, Field.Store.NO, Field.Index.ANALYZED);
+                doc.Add(field);
+            }
 
             return doc;
         }

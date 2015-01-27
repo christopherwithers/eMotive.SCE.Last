@@ -76,7 +76,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                     xlPackage.Encryption.Password = password;
 
                     SendPassword(password, reportName);
-                    worksheet.Cells[1,1].Value = "This report contain personal details. Please ensure that it is kept confidential.";
+                    worksheet.Cells[1,1].Value = "This report contains personal details. Please ensure that it is kept confidential.";
                     using (var r = worksheet.Cells["A1:X1"])
                     {
                         r.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -381,7 +381,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
 
                 SendPassword(password, reportName);
 
-                worksheet.Cells[1, 1].Value = "This report contain personal details. Please ensure that it is kept confidential.";
+                worksheet.Cells[1, 1].Value = "This report contains personal details. Please ensure that it is kept confidential.";
                 using (var r = worksheet.Cells["A1:X1"])
                 {
                     r.Style.Fill.PatternType = ExcelFillStyle.Solid;
@@ -780,7 +780,7 @@ namespace eMotive.SCE.Areas.Admin.Controllers
                     xlPackage.Encryption.Password = password;
 
                     SendPassword(password, reportName);
-                    worksheet.Cells[1, 1].Value = "This report contain personal details. Please ensure that it is kept confidential.";
+                    worksheet.Cells[1, 1].Value = "This report contains personal details. Please ensure that it is kept confidential.";
                     using (var r = worksheet.Cells["A1:W1"])
                     {
                         r.Style.Fill.PatternType = ExcelFillStyle.Solid;

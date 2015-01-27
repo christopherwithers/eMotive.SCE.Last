@@ -21,7 +21,7 @@ namespace eMotive.Services.Objects
             {
                 connection.Open();
                 const string sql =
-                    "SELECT a.*, c.* FROM `Users` a INNER JOIN `UserhasRoles` b ON a.id=b.UserID INNER JOIN `SceReference` c ON a.`ID`=c.`idUser` WHERE b.`RoleID`=6;";
+                    "SELECT a.*, c.* FROM `Users` a INNER JOIN `UserhasRoles` b ON a.id=b.UserID INNER JOIN `SceReference` c ON a.`ID`=c.`idUser` WHERE b.`RoleID`=6 AND a.`Archived` = 0;";
                 return connection.Query<SCEReportItem>(sql);
             }
         }
